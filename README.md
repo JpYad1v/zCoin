@@ -1,0 +1,2 @@
+# zCoin
+Trading Platform

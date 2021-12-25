@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>zCoin - Assets</title>
+  <!-- CSS -->
+  <link rel="stylesheet" href="./css/styles.css">
+  <link rel="stylesheet" href="./css/admin-styles.css">
+
+  <!-- BOOTSTRAP -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- GOOGLE FONTS -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&display=swap" rel="stylesheet">
+
+  <!-- jQUERY -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <script type="text/javascript">
+    window.setTimeout(function() {
+      $(".alert").fadeTo(500, 0).slideUp(500, function() {
+        $(this).remove();
+      });
+    }, 2000);
+  </script>
+
+  <script type="text/javascript">
+    var symbol = "<%= symbol %>";
+    var successFromApp = "<%= success %>";
+    var failureFromApp = "<%= failure %>";
+    var portfolioPrice = "<%= portfolioPrice %>";
+    var totalQty = "<%= totalQty %>";
+
+    function getData() {
+      const url = "https://api.nomics.com/v1/currencies/ticker?key=1f72151d3ea004f9305149cabf5698b386786850&ids=" + symbol + "&interval=1d,30d&convert=INR&per-page=100&page=1";
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          var html = data.map(price => {
+
+            if (price["1d"].price_change_pct < 0) {
+              var change = '<p style="color:red">&#8595;&nbsp;' + parseFloat(price["1d"].price_change_pct * 100).toFixed(2) + '%</p>';
+            } else {
+              var change = '<p style="color:lightgreen">&#8593;&nbsp;' + parseFloat(price["1d"].price_change_pct * 100).toFixed(2) + '%</p>';
+            }
+
+            //console.log(price["1d"].volume);
+            if (successFromApp == 'Watchlist') {
+              var alertMsg = `<div class="alert alert-success alert-custom alert-dismissible fade in" role="alert" id="success-alert">
+                  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                  ${price.name} was Added to Watchlist Successfully!
+                </div>`;
+            } else if (successFromApp == 'Success') {
+              var alertMsg = `<div class="alert alert-success alert-custom alert-dismissible fade in" role="alert" id="success-alert">
+                  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                  You have Successfully brought ${price.name}. Please Check your portfolio to track price!
+                </div>`;
+            } else if (failureFromApp == 'Failed') {
+              var alertMsg = `<div class="alert alert-danger alert-custom alert-dismissible fade in" role="alert" id="success-alert">
+                  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                  It seems you dont have sufficient balance to buy in your wallet to buy ${price.name}!
+                </div>`;
+            } else {
+              var alertMsg = '';
+            }
+
+
+            return `
+
+              ${alertMsg}
+
+              <div style="display:flex; justify-content: space-between">
+
+              <h4 style="margin:10px 20px 0 20px; padding-top:10px;"> WALLET PRICE: ${portfolioPrice} </h4>
+
+              <h4 style="margin:10px 20px 0 20px; padding-top:10px;"> ${price.symbol} QTY: ${totalQty} &emsp; TOTAL WORTH: ${(price.price * totalQty).toFixed(2)} </h4>
+              <!-- <form action="/assets" method="post">
+
+                <button name="symbol" value=${price.symbol} style="border:none; text-decoration:none; color:#fff;">
+                ADD ${price.name} to &nbsp; <img class="crypto-coins" src="././images/watchlist.png" alt="CRYPTO_COIN">&emsp;
+                </button>
+              </form> -->
+
+              </div>
+
+              <hr style="height:1px;border-width:0;color:gray;background-color:#000">
+
+
+              <div style="display:flex; justify-content:center;">
+              <img class="crypto-coins" src="${price.logo_url}" alt="CRYPTO_COIN">&emsp;
+              <h4>${price.name}&nbsp;(${price.id})</h4>
+              </div>
+              <br>
+
+              <div style="display:flex; justify-content:center;">
+              <p>&#x20B9;${price.price}</p>&emsp;
+              <p>${change}</p><br>
+
+              </div>
+
+              <div class="container" style="width:100%; text-align:left;">
+
+              <form action="/sell" method="post">
+                <label class="label-login" for="uname"><b>Sell</b></label>
+                <input type="text" placeholder="Enter Price to sell, NOTE: Current Coin Price may vary based on market price" name="price" autocomplete="off" required>
+                <input type="hidden" name="symbol" value="${price.symbol}">
+                <div style="text-align:center;">
+                <button name="btntype" value="sell" class="home-button">Sell</button>
+                <!--<button name="btntype" value="sell" class="home-button login">Sell</button>-->
+                </div>
+              </form>
+
+              </div>
+              `;
+          }).join("");
+
+          //$('#crypto').html(html);
+          document.querySelector('#asset').innerHTML = html;
+
+
+
+        })
+    }
+
+    setTimeout(function() {
+      getData();
+    }, 1000);
+
+
+    function readMore() {
+      var x = document.getElementById('morebtn');
+      x.style.display = 'none';
+      document.querySelector('#readmore').innerHTML = description;
+    }
+  </script>
+
+</head>
+
+<body style="background-color: #181E29">
+
+  <nav class="navbar navbar-light bg-light nav-center">
+      <a class="navbar-brand mx-auto" href="#"> <img src="./images/logo.png" width="70" height="70" alt=""> </a>
+  </nav>
+
+    <nav class="nav"></nav>
+
+  <nav style="position:fixed" class="top-nav">
+    <div class="side-nav">
+      <a href="investordb"><img src="./images/coins.png" alt="DASHBOARD"><br>AVAILABLE COINS</a><br>
+      <a href="watchlist"><img src="./images/watchlist.png" alt="WATCHLIST"><br>WATCHLIST</a><br>
+      <a href="portfolio"><img src="./images/portfolio.png" alt="PORTFOLIO"><br>PORTFOLIO</a><br>
+      <a href="orders"><img src="./images/orders1.png" alt="ORDERS"><br>ORDERS</a><br>
+      <a href="logout"><img src="./images/logout.png" alt="LOGOUT"><br>LOGOUT</a><br>
+    </div>
+  </nav>
+
+  <div id="asset" class="coin-info asset-design" style="top: 15%;">
+  </div>
+
+
+</body>
+
+</html>

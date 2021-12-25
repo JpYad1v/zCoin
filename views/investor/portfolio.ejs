@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+
+  <!-- TITLE -->
+  <title>zCoin - Investor Signin</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="./css/styles.css">
+  <link rel="stylesheet" href="./css/admin-styles.css">
+
+  <!-- BOOTSTRAP -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- GOOGLE FONTS -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&display=swap" rel="stylesheet">
+
+  <!-- jQUERY -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <script type="text/javascript">
+    window.setTimeout(function() {
+      $(".alert").fadeTo(500, 0).slideUp(500, function() {
+        $(this).remove();
+      });
+    }, 2000);
+  </script>
+
+  <script type="text/javascript">
+    var symbols = "<%= symbols %>";
+    var prices = "<%= prices %>";
+    var avgBuyPrice = "<%= avgBuyPrice %>";
+    var totalBuyPrice = "<%= buyPrice %>"
+    console.log(symbols);
+    console.log(prices);
+    console.log(avgBuyPrice);
+    console.log(totalBuyPrice);
+
+    symbols = symbols.split(',');
+    prices = prices.split(',');
+    avgBuyPrice = avgBuyPrice.split(',');
+    totalBuyPrice = totalBuyPrice.split(',');
+    console.log(symbols);
+    console.log(prices);
+    console.log(avgBuyPrice);
+
+    function getData() {
+      const url = "https://api.nomics.com/v1/currencies/ticker?key=1f72151d3ea004f9305149cabf5698b386786850&ids=" + symbols + "&interval=1d,30d&convert=INR&per-page=100&page=1";
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+
+          var i = 0;
+          var currentPrice = [];
+
+          const html = data.map(price => {
+            currentPrice.push(price.price * prices[i]);
+            i += 1;
+
+            return `${currentPrice}`
+          }).join("");
+
+          currentPriceHTML = 0;
+          for (let i = 0; i < currentPrice.length; i++) {
+            currentPriceHTML += currentPrice[i];
+          }
+
+          currentPriceHTML = currentPriceHTML.toFixed(2);
+          document.querySelector('#currentPrice').innerHTML = `CURRENT <br> &#x20B9; ${currentPriceHTML}`;
+
+          var returns = currentPriceHTML - `<%= investedPrice %>`;
+          returns = returns.toFixed(2);
+          if (returns > 0) {
+            document.querySelector('#returns').innerHTML = `RETURNS <br> <p style="color:lightgreen"> + &#x20B9; ${returns} </p>`;
+          } else {
+            document.querySelector('#returns').innerHTML = `RETURNS <br> <p style="color:red"> &#x20B9; ${returns} </p>`;
+          }
+
+          var totalReturns = (returns / `<%= investedPrice %>`) * 100;
+          totalReturns = totalReturns.toFixed(2);
+          if (totalReturns > 0) {
+            document.querySelector('#totalReturns').innerHTML = `TOTAL RETURNS % <br> <p style="color:lightgreen"> + &#x20B9; ${totalReturns} % </p>`;
+          } else {
+            document.querySelector('#totalReturns').innerHTML = `TOTAL RETURNS % <br> <p style="color:red"> &#x20B9; ${totalReturns} % </p>`;
+          }
+
+
+
+        })
+    }
+    getData();
+    setInterval(getData, 10000);
+
+    function investedCoins() {
+      const url = "https://api.nomics.com/v1/currencies/ticker?key=1f72151d3ea004f9305149cabf5698b386786850&ids=" + symbols + "&interval=1d,30d&convert=INR&per-page=100&page=1";
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          var i = -1;
+          const html = data.map(price => {
+            //console.log("PRICE = " + price.price);
+            //console.log("COIN = " + price.symbol);
+            //console.log("QTY = " + prices[i]);
+            i += 1;
+            if ((price.price - avgBuyPrice[i]) * prices[i] > 0){
+              returns = `<p style="color:lightgreen">Returns : ${(price.price - avgBuyPrice[i]) * prices[i]}</p>`;
+            }
+            else {
+              returns = `<p style="color:red">RETURNS : ${(price.price - avgBuyPrice[i]) * prices[i]}</p>`;
+            }
+            return `
+            <center>
+              <img class="crypto-coins" src="${price.logo_url}" alt="CRYPTO_COIN">
+              <br><br>
+              <p> ${price.name} </p>
+              <p> Qty : ${prices[i]} </p>
+              <p> AVERAGE BUYING PRICE : ${avgBuyPrice[i]} &emsp; CURRENT BUYING PRICE : &#x20B9; ${price.price} </p>
+
+              <p> INVESTED : ${totalBuyPrice[i]} &emsp; CURRENT : ${prices[i] * price.price} </p>
+
+              <p>  ${returns}</p>
+
+              <a href="sell?symbol=${price.symbol}"> <button class="btn-sell">Sell</button> </a>
+
+              <br>
+              <hr style="height:1px;border-width:0;color:gray;background-color:#000">
+            </center>
+            `;
+
+
+
+          }).join("");
+          console.log(html);
+
+          document.querySelector('#coinInvested').innerHTML = `<center><h4>INVESTED COINS</h4></center><hr style="height:1px;border-width:0;color:gray;background-color:#000">` + html;
+        })
+    }
+
+    investedCoins();
+    setInterval(investedCoins, 10000);
+  </script>
+
+</head>
+
+<body style="background-color: #181E29">
+
+
+
+  <nav class="navbar navbar-light bg-light nav-center">
+      <a class="navbar-brand mx-auto" href="#"> <img src="./images/logo.png" width="70" height="70" alt=""> </a>
+  </nav>
+
+  <!-- Top Nav -->
+  <nav class="nav"></nav>
+
+  <nav style="position:fixed" class="top-nav">
+    <div class="side-nav">
+      <a href="investordb"><img src="./images/coins.png" alt="DASHBOARD"><br>AVAILABLE COINS</a><br>
+      <a href="watchlist"><img src="./images/watchlist.png" alt="WATCHLIST"><br>WATCHLIST</a><br>
+      <a href="portfolio"><img src="./images/portfolio.png" alt="PORTFOLIO"><br>PORTFOLIO</a><br>
+      <a href="orders"><img src="./images/orders1.png" alt="ORDERS"><br>ORDERS</a><br>
+      <a href="logout"><img src="./images/logout.png" alt="LOGOUT"><br>LOGOUT</a><br>
+    </div>
+  </nav>
+
+
+  <div class="total-platform-coins-investor">
+    <h4>Your Portfolio</h4>
+  </div>
+
+  <!-- Investor Sign in -->
+
+  <div class="sign-in">
+
+    <div class="wallet" style="box-shadow: 0 5px 15px rgb(93 27 248 / 50%); padding: 20px; width:50%; margin:auto;">
+      <h4 style="text-align:center; line-height: 1.6;">WALLET PRICE <br> &#x20B9; <%= walletprice %> </h4>
+      <br>
+      <div style="display:flex; justify-content:space-between; margin-left: 20%; margin-right: 30%;">
+        <p id="currentPrice">0.00 </p>
+        <p>INVESTED <br> &#x20B9; <%= investedPrice %> </p>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-left: 20%; margin-right: 18.6%;">
+        <p id="returns">0.00 </p>
+        <p id="totalReturns">0.00 </p>
+      </div>
+    </div>
+    <br>
+
+
+    <div id="coinInvested" style=" padding: 20px; width:80%; margin:auto;"> </div>
+
+  </div>
+
+</body>
+
+</html>

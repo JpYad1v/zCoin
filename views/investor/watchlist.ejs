@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>zCoin - Admin</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="./css/admin-styles.css">
+
+  <!-- BOOTSTRAP -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- GOOGLE FONTS -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&display=swap" rel="stylesheet">
+
+  <!-- jQUERY -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <!-- ALERT SCRIPT -->
+  <script type="text/javascript">
+    window.setTimeout(function() {
+      $(".alert").fadeTo(500, 0).slideUp(500, function() {
+        $(this).remove();
+      });
+    }, 2000);
+  </script>
+
+  <script type="text/javascript">
+    var dbCoinsfromNodejs = "<%= dbCoins %>";
+    dbCoins = dbCoinsfromNodejs.substring(0, dbCoinsfromNodejs.length - 1);
+
+    function getData() {
+      const url = "https://api.nomics.com/v1/currencies/ticker?key=1f72151d3ea004f9305149cabf5698b386786850&ids=DOGE," + dbCoins + "&interval=1d,30d&convert=INR&per-page=100&page=1";
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          const html = data.map(price => {
+            if (price["1d"].price_change_pct < 0) {
+              var change = '<p style="color:red">&#8595;&nbsp;' + parseFloat(price["1d"].price_change_pct * 100).toFixed(2) + '%</p>';
+            } else {
+              var change = '<p style="color:lightgreen">&#8593;&nbsp;' + parseFloat(price["1d"].price_change_pct * 100).toFixed(2) + '%</p>';
+            }
+            //console.log(price["1d"].volume);
+            return `
+
+              <tr>
+
+                <td><img class="crypto-coins" src="${price.logo_url}" alt="CRYPTO_COIN">&emsp;&emsp;&emsp;<a style="text-decoration:none; color:white;" href="assets?symbol=${price.symbol}">${price.name}</a></td>
+                <td>${price.symbol}</td>
+                <td>&#x20B9;${price.price}</td>
+                <td>${change}</td>
+                <td>${price.rank}</td>
+                <td><a href="remove?symbol=${price.symbol}"> <img class="remove" src="../images/remove.png" alt="REMOVE"></a></td>
+
+              </tr>
+              `;
+          }).join("");
+
+          //$('#crypto').html(html);
+          document.querySelector('#crypto').innerHTML =
+            '<table class="table table-sm"><thead class="thread-light"><tr><th scope="col"></th><th scope="col">SYMBOL</th><th scope="col">PRICE</th><th scope="col">24H CHANGE</th><th scope="col">RANK</th><th scope="col">REMOVE</th></tr></thead><tbody>' +
+            html + '</tbody></table>';
+        })
+    }
+    getData();
+    setInterval(getData, 10000);
+  </script>
+
+</head>
+
+<body style="background-color: #181E29">
+
+  <nav class="navbar navbar-light bg-light nav-center">
+      <a class="navbar-brand mx-auto" href="#"> <img src="./images/logo.png" width="70" height="70" alt=""> </a>
+  </nav>
+
+  <nav class="nav"></nav>
+
+
+
+  <nav style="position:fixed" class="top-nav">
+    <div class="side-nav">
+      <a href="investordb"><img src="./images/coins.png" alt="DASHBOARD"><br>AVAILABLE COINS</a><br>
+      <a href="watchlist"><img src="./images/watchlist.png" alt="WATCHLIST"><br>WATCHLIST</a><br>
+      <a href="portfolio"><img src="./images/portfolio.png" alt="PORTFOLIO"><br>PORTFOLIO</a><br>
+      <a href="orders"><img src="./images/orders1.png" alt="ORDERS"><br>ORDERS</a><br>
+      <a href="logout"><img src="./images/logout.png" alt="LOGOUT"><br>LOGOUT</a><br>
+    </div>
+  </nav>
+
+
+  <div class="total-platform-coins-investor">
+    <h4>Your Watchlist Coins</h4>
+  </div>
+
+
+  <div class="crypto-table" id="crypto"></div>
+
+</body>
+
+</html>

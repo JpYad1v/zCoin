@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>zCoin - Admin Dashboard</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="./css/styles.css">
+  <link rel="stylesheet" href="./css/admin-styles.css">
+
+  <!-- BOOTSTRAP -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- GOOGLE FONTS -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&display=swap" rel="stylesheet">
+
+
+
+</head>
+
+<body style="background-color: #181E29">
+
+  <nav class="navbar navbar-light bg-light nav-center">
+      <a class="navbar-brand mx-auto" href="#"> <img src="./images/logo.png" width="70" height="70" alt=""> </a>
+  </nav>
+
+  <nav class="nav"></nav>
+
+  <div class="wrapper">
+    <ul>
+      <li><a href="admindb"><img class="coins" src="./images/admin/line-graph.png" alt="ADMIN DB"></a></li>
+      <li><a href="addCoin"><img class="coins" src="./images/admin/coins.png" alt="ADD COIN"></a></li>
+      <li><a href="#sendMail"><img class="coins" src="./images/admin/message.png" alt="SEND NOTIFICATIONS"></li>
+      <li><a href="#logout"><img class="coins" src="./images/admin/logout.png" alt="LOGOUT"></li>
+    </ul>
+  </div>
+
+  <div class="total-platform-coins">
+    <p class="heading">Total Platform Coins</p> <br>
+    <p class="values"><%= totalPlatformCoins %></p>
+  </div>
+
+  <div class="user-count">
+    <p class="heading">Total Registration Count</p> <br>
+    <p class="values"><%= totalRegistrationCount %></p>
+  </div>
+
+  <div class="total-orders">
+    <p class="heading">Total Platform Orders</p> <br>
+    <p class="values"><%= totalBuyPrice %></p>
+  </div>
+
+  <div id="recentOrders" class="recent-orders">
+    <p class="recent-heading">Recent Platform Orders</p>
+    <hr>
+    <p> USERNAME COINSYMBOL BUYPRICE TIMESTAMP </p>
+  </div>
+
+  <div id="recentListing" class="recent-coins" ></div>
+
+  <script type="text/javascript">
+    var symbols = "<%= symbols %>";
+    var timestamps = "<%= timestamps %>";
+
+    symbols = symbols.split(",");
+    timestamps = timestamps.split(",");
+
+    console.log(symbols);
+
+    document.querySelector('#recentListing').innerHTML =
+    `
+    <h4 class="recent-heading">Recent Coin Listings</h4>
+    <hr class="headerLine">
+    <center>
+    <table class="table">
+    <thead> <tr> <th class="text-center" scope="col">CoinSymbol</th> <th class="text-center" scope="col">TimeStamp</th> </tr> </thead>
+    <tbody>
+    <tr><td class="text-center"> ${symbols[0]} </td><td class="text-center"> ${timestamps[0]} </td></tr>
+    <tr><td class="text-center"> ${symbols[1]} </td><td class="text-center"> ${timestamps[1]} </td></tr>
+    <tr><td class="text-center"> ${symbols[2]} </td><td class="text-center"> ${timestamps[2]} </td></tr>
+    <tr><td class="text-center"> ${symbols[3]} </td><td class="text-center"> ${timestamps[3]} </td></tr>
+    <tr><td class="text-center"> ${symbols[4]} </td><td class="text-center"> ${timestamps[4]} </td></tr>
+    </tbody>
+    </table>
+    </center>
+    `;
+
+    var buyuser = "<%= buyuser %>";
+    var buysymbol = "<%= buysymbol %>";
+    var buyPrice = "<%= buyPrice %>";
+
+    buyuser = buyuser.split(",");
+    buysymbol = buysymbol.split(",");
+    buyPrice = buyPrice.split(",");
+
+    document.querySelector('#recentOrders').innerHTML =
+    `
+    <h4 class="recent-heading">Recent Buy Orders</h4>
+    <hr class="headerLine">
+    <center>
+    <table class="table">
+    <thead> <tr> <th class="text-center" scope="col">User</th> <th class="text-center" scope="col">Coin Symbol</th> <th class="text-center" scope="col">Buy Price</th> </tr> </thead>
+    <tbody>
+    <tr><td class="text-center"> ${buyuser[0]} </td><td class="text-center"> ${buysymbol[0]} </td><td style="color:lightgreen" class="text-center"> ${buyPrice[0]} </td></tr>
+    <tr><td class="text-center"> ${buyuser[1]} </td><td class="text-center"> ${buysymbol[1]} </td><td style="color:lightgreen" class="text-center"> ${buyPrice[1]} </td></tr>
+    <tr><td class="text-center"> ${buyuser[2]} </td><td class="text-center"> ${buysymbol[2]} </td><td style="color:lightgreen" class="text-center"> ${buyPrice[2]} </td></tr>
+    <tr><td class="text-center"> ${buyuser[3]} </td><td class="text-center"> ${buysymbol[3]} </td><td style="color:lightgreen" class="text-center"> ${buyPrice[3]} </td></tr>
+    <tr><td class="text-center"> ${buyuser[4]} </td><td class="text-center"> ${buysymbol[4]} </td><td style="color:lightgreen" class="text-center"> ${buyPrice[4]} </td></tr>
+    </tbody>
+    </table>
+    </center>
+    `;
+
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+
+  <!-- TITLE -->
+  <title>zCoin - Add Coin</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="./css/styles.css">
+  <link rel="stylesheet" href="./css/admin-styles.css">
+
+  <!-- BOOTSTRAP -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+  <!-- GOOGLE FONTS -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&display=swap" rel="stylesheet">
+
+  <!-- jQUERY -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <script type="text/javascript">
+    window.setTimeout(function() {
+      $(".alert").fadeTo(500, 0).slideUp(500, function() {
+        $(this).remove();
+      });
+    }, 2000);
+  </script>
+
+</head>
+
+<body style="background-color: #181E29">
+
+  <nav class="navbar navbar-light bg-light nav-center">
+      <a class="navbar-brand mx-auto" href="#"> <img src="./images/logo.png" width="70" height="70" alt=""> </a>
+  </nav>
+
+  <nav class="nav"></nav>
+
+  <div class="wrapper">
+    <ul>
+      <li><a href="admindb"><img class="coins" src="./images/admin/line-graph.png" alt="ADMIN DB"></a></li>
+      <li><a href="addCoin"><img class="coins" src="./images/admin/coins.png" alt="ADD COIN"></a></li>
+      <li><a href="#sendMail"><img class="coins" src="./images/admin/message.png" alt="SEND NOTIFICATIONS"></li>
+      <li><a href="#logout"><img class="coins" src="./images/admin/logout.png" alt="LOGOUT"></li>
+    </ul>
+  </div>
+
+  <div class="add-symbol">
+
+    <% if (success != '') { %>
+    <div class="alert alert-success alert-custom alert-dismissible fade in" role="alert" id="success-alert">
+      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+      Coin Added Successfully!
+    </div>
+    <% } %>
+
+    <% if (failure != '') { %>
+    <div class="alert alert-danger alert-custom alert-dismissible fade in" role="alert" id="success-alert">
+      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+      You have entered a wrong Symbol or the Coin you added may already exist in the DB
+    </div>
+    <% } %>
+
+    <% if (successDel != '') { %>
+    <div class="alert alert-success alert-custom alert-dismissible fade in" role="alert" id="success-alert">
+      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+      Coin Deleted Successfully!
+    </div>
+    <% } %>
+
+    <% if (failureDel != '') { %>
+    <div class="alert alert-danger alert-custom alert-dismissible fade in" role="alert" id="success-alert">
+      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+      The Coin you have entered is not in the Database.
+    </div>
+    <% } %>
+
+    <form action="/addCoin" method="post">
+
+      <div class="imgcontainer">
+        <img src="./images/admin/piggy-bank.png" alt="Avatar" class="avatar">
+      </div>
+
+      <div class="container" style="width:100%;">
+        <label class="label-login" for="uname"><b>Coin Symbol</b></label>
+        <input type="text" placeholder="Enter Coin Symbol" name="newcoin" autocomplete="off" required>
+
+        <div style="text-align:center;">
+          <button style="margin-left:-20px;" name="btntype" value="add" class="home-button">Add Coin</button>
+          <button name="btntype" value="remove" class="home-button login">Remove Coin</button>
+        </div>
+        <!--<button class="home-button login-button" type="submit">Add Coin</button>-->
+      </div>
+
+
+    </form>
+  </div>
+
+</body>
+
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+
+  <!-- TITLE -->
+  <title>zCoin - Get Started</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="./css/styles.css">
+  <link rel="stylesheet" href="./css/admin-styles.css">
+
+  <!-- BOOTSTRAP -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- GOOGLE FONTS -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&display=swap" rel="stylesheet">
+
+  <!-- jQUERY -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <script type="text/javascript">
+    window.setTimeout(function() {
+      $(".alert").fadeTo(500, 0).slideUp(500, function() {
+        $(this).remove();
+      });
+    }, 2000);
+  </script>
+</head>
+
+<body style="background-color: #181E29">
+
+  <nav class="navbar navbar-light bg-light nav-center">
+      <a class="navbar-brand mx-auto" href="#"> <img src="./images/logo.png" width="70" height="70" alt=""> </a>
+  </nav>
+
+  <!-- Top Nav -->
+  <nav class="nav"></nav>
+
+  <!-- GET STARTED -->
+  <div class="get-started">
+
+    <% if (success != '') { %>
+    <div class="alert alert-success alert-custom alert-dismissible fade in" role="alert" id="success-alert">
+      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+      Registratation Successfully!
+    </div>
+    <% } %>
+
+    <% if (failure != '') { %>
+    <div class="alert alert-danger alert-custom alert-dismissible fade in" role="alert" id="success-alert">
+      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+      Error! Username Already Exists.
+    </div>
+    <% } %>
+
+    <form action="/getstarted" method="post">
+
+      <div class="imgcontainer">
+        <a href="/"><span class="close-login" title="Close Modal">&times;</span></a>
+        <img src="./images/key.png" alt="Avatar" class="avatar">
+      </div>
+
+      <div class="container" style="width:100%;">
+        <label class="label-login" for="fname"><b>Fullname</b></label>
+        <input type="text" placeholder="Enter Fullname" name="fname" autocomplete="off" required>
+
+        <label class="label-login" for="Uname"><b>Username</b></label>
+        <input type="text" placeholder="Enter Username" name="uname" autocomplete="off" required><br><br>
+
+        <label class="label-login" for="Uname"><b>Gender</b></label>
+        <div class="form-check form-check-inline gender">
+          <input class="form-check-input" type="radio" name="gender" id="inlineRadio1" value="male" />
+          <label style="color:#888; padding-right: 10px;" class="form-check-label" for="inlineRadio1"></label>Male&emsp;
+          <input class="form-check-input" type="radio" name="gender" id="inlineRadio2" value="female" />
+          <label style="color:#888; padding-right: 10px;" class="form-check-label" for="inlineRadio2"></label>Female
+        </div><br>
+
+        <label class="label-login" for="email"><b>Email ID</b></label>
+        <input type="email" placeholder="Enter Email" name="emailid" autocomplete="off" required>
+
+        <label class="label-login" for="psw"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="psw" autocomplete="off" required>
+
+        <button class="home-button login-button" type="submit">Register</button>
+      </div>
+
+    </form>
+</body>
+</div>
+
+</html>

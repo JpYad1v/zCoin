@@ -34,20 +34,13 @@
   <script type="text/javascript">
     var symbols = "<%= symbols %>";
     var prices = "<%= prices %>";
-    var avgBuyPrice = "<%= avgBuyPrice %>";
-    var totalBuyPrice = "<%= buyPrice %>"
     console.log(symbols);
     console.log(prices);
-    console.log(avgBuyPrice);
-    console.log(totalBuyPrice);
 
     symbols = symbols.split(',');
     prices = prices.split(',');
-    avgBuyPrice = avgBuyPrice.split(',');
-    totalBuyPrice = totalBuyPrice.split(',');
     console.log(symbols);
     console.log(prices);
-    console.log(avgBuyPrice);
 
     function getData() {
       const url = "https://api.nomics.com/v1/currencies/ticker?key=1f72151d3ea004f9305149cabf5698b386786850&ids=" + symbols + "&interval=1d,30d&convert=INR&per-page=100&page=1";
@@ -88,61 +81,11 @@
           } else {
             document.querySelector('#totalReturns').innerHTML = `TOTAL RETURNS % <br> <p style="color:red"> &#x20B9; ${totalReturns} % </p>`;
           }
-
-
-
         })
     }
     getData();
     setInterval(getData, 10000);
 
-    function investedCoins() {
-      const url = "https://api.nomics.com/v1/currencies/ticker?key=1f72151d3ea004f9305149cabf5698b386786850&ids=" + symbols + "&interval=1d,30d&convert=INR&per-page=100&page=1";
-      fetch(url)
-        .then(response => response.json())
-        .then(data => {
-          var i = -1;
-          const html = data.map(price => {
-            //console.log("PRICE = " + price.price);
-            //console.log("COIN = " + price.symbol);
-            //console.log("QTY = " + prices[i]);
-            i += 1;
-            if ((price.price - avgBuyPrice[i]) * prices[i] > 0){
-              returns = `<p style="color:lightgreen">Returns : ${(price.price - avgBuyPrice[i]) * prices[i]}</p>`;
-            }
-            else {
-              returns = `<p style="color:red">RETURNS : ${(price.price - avgBuyPrice[i]) * prices[i]}</p>`;
-            }
-            return `
-            <center>
-              <img class="crypto-coins" src="${price.logo_url}" alt="CRYPTO_COIN">
-              <br><br>
-              <p> ${price.name} </p>
-              <p> Qty : ${prices[i]} </p>
-              <p> AVERAGE BUYING PRICE : ${avgBuyPrice[i]} &emsp; CURRENT BUYING PRICE : &#x20B9; ${price.price} </p>
-
-              <p> INVESTED : ${totalBuyPrice[i]} &emsp; CURRENT : ${prices[i] * price.price} </p>
-
-              <p>  ${returns}</p>
-
-              <a href="sell?symbol=${price.symbol}"> <button class="btn-sell">Sell</button> </a>
-
-              <br>
-              <hr style="height:1px;border-width:0;color:gray;background-color:#000">
-            </center>
-            `;
-
-
-
-          }).join("");
-          console.log(html);
-
-          document.querySelector('#coinInvested').innerHTML = `<center><h4>INVESTED COINS</h4></center><hr style="height:1px;border-width:0;color:gray;background-color:#000">` + html;
-        })
-    }
-
-    investedCoins();
-    setInterval(investedCoins, 10000);
   </script>
 
 </head>
@@ -158,19 +101,14 @@
   <!-- Top Nav -->
   <nav class="nav"></nav>
 
-  <nav style="position:fixed" class="top-nav">
-    <div class="side-nav">
-      <a href="investordb"><img src="./images/coins.png" alt="DASHBOARD"><br>AVAILABLE COINS</a><br>
-      <a href="watchlist"><img src="./images/watchlist.png" alt="WATCHLIST"><br>WATCHLIST</a><br>
-      <a href="portfolio"><img src="./images/portfolio.png" alt="PORTFOLIO"><br>PORTFOLIO</a><br>
-      <a href="orders"><img src="./images/orders1.png" alt="ORDERS"><br>ORDERS</a><br>
-      <a href="logout"><img src="./images/logout.png" alt="LOGOUT"><br>LOGOUT</a><br>
-    </div>
-  </nav>
-
-
-  <div class="total-platform-coins-investor">
-    <h4>Your Portfolio</h4>
+  <div class="wrapper">
+    <ul>
+      <li><a href="investordb"><img class="coins" src="./images/admin/line-graph.png" alt="INVESTOR DB"></a></li>
+      <li><a href="watchlist"><img class="coins" src="./images/watchlist.png" alt="WATCHLIST"></a></li>
+      <li><a href="portfolio"><img class="coins" src="./images/portfolio1.png" alt="PORTFOLIO"></li>
+      <li><a href="orders"><img class="coins" src="./images/orders.png" alt="ORDERS"></li>
+      <li><a href="logout"><img class="coins" src="./images/admin/logout.png" alt="LOGOUT"></a></li>
+    </ul>
   </div>
 
   <!-- Investor Sign in -->

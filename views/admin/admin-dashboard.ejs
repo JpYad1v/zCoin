@@ -34,9 +34,14 @@
     <ul>
       <li><a href="admindb"><img class="coins" src="./images/admin/line-graph.png" alt="ADMIN DB"></a></li>
       <li><a href="addCoin"><img class="coins" src="./images/admin/coins.png" alt="ADD COIN"></a></li>
-      <li><a href="#sendMail"><img class="coins" src="./images/admin/message.png" alt="SEND NOTIFICATIONS"></li>
-      <li><a href="#logout"><img class="coins" src="./images/admin/logout.png" alt="LOGOUT"></li>
+      <li><a href="sendMail"><img class="coins" src="./images/admin/message.png" alt="SEND NOTIFICATIONS"></li>
+      <li><a href="adminlogout"><img class="coins" src="./images/admin/logout.png" alt="LOGOUT"></li>
     </ul>
+  </div>
+
+  <div class="total-buy-orders">
+    <p class="heading">Total Buy Orders</p> <br>
+    <p class="values"><%= totalBuyPrice %></p>
   </div>
 
   <div class="total-platform-coins">
@@ -49,8 +54,8 @@
     <p class="values"><%= totalRegistrationCount %></p>
   </div>
 
-  <div class="total-orders">
-    <p class="heading">Total Platform Orders</p> <br>
+  <div class="total-sell-orders">
+    <p class="heading">Total Sell Orders</p> <br>
     <p class="values"><%= totalBuyPrice %></p>
   </div>
 

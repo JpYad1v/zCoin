@@ -120,9 +120,9 @@ app.post("/investorlogin", (req, res) => {
 
 })
 
-// 1. GET INVESTOR DASHBOARD PAGE
+// 1. INVESTOR DASHBOARD PAGE
+// GET INVESTOR DASHBOARD PAGE
 app.get("/investordb", (req, res) => {
-
   console.log("\nINVESTOR DASHBOARD LOGS\n------------------------------------------------------------------------------------------------\n");
   const selectCoinSymbolResult = con.query(`SELECT CoinSymbol FROM addcoin;`);
   var dbCoins = "";
@@ -136,8 +136,53 @@ app.get("/investordb", (req, res) => {
     dbCoins: dbCoins
   })
 });
+// GET ASSETS PAGE
 app.get("/assets", (req, res) => {
-  res.render('investor/assets');
+
+  console.log("\nGET ASSETS PAGE LOGS\n------------------------------------------------------------------------------------------------\n");
+  console.log("ASSET SYMBOL = " + req.originalUrl.split("=")[1]);
+  var symbol = req.originalUrl.split("=")[1];
+  const rewardPriceResult = con.query(`SELECT Reward FROM investors WHERE UserName = '${investorUsername}';`);
+  console.log("PORTFOLIO PRICE = " + rewardPriceResult[0]['Reward']);
+  var portfolioPrice = rewardPriceResult[0]['Reward'];
+  var description = nomicsCoin.getDescription(symbol);
+  res.render('investor/assets', {
+    symbol: symbol,
+    success: '',
+    failure: '',
+    portfolioPrice: portfolioPrice,
+    description: description
+  });
+})
+// POST ADD SYMBOL TO WATCHLIST
+app.post("/assets", (req, res) => {
+
+  console.log("\nADD COIN TO WATCHLIST LOGS\n------------------------------------------------------------------------------------------------\n");
+  var watchlistSymbol = req.body.symbol;
+  console.log("COIN SYMBOL TO ADD IN WATCHLIST = " + watchlistSymbol);
+  const rewardPriceResult = con.query(`SELECT Reward FROM investors WHERE UserName = '${investorUsername}';`);
+  var portfolioPrice = rewardPriceResult[0]['Reward'];
+  var description = nomicsCoin.getDescription(watchlistSymbol);
+  const addSymbolWatchlistResult = con.query(`INSERT INTO watchlist (UserName, CoinSymbol) VALUES ('${investorUsername}', '${watchlistSymbol}')`);
+  if (addSymbolWatchlistResult.affectedRows > 0){
+    console.log("COIN ADDED TO WATCHLIST");
+    res.render('investor/assets', {
+      symbol: watchlistSymbol,
+      success: 'WatchlistSuccess',
+      failure: '',
+      portfolioPrice: portfolioPrice,
+      description: description
+    })
+  } else {
+    console.log("ERROR WHILE ADDING COIN TO WATCHLIST");
+    res.render('investor/assets', {
+      symbol: watchlistSymbol,
+      success: '',
+      failure: 'WatchlistFailed',
+      portfolioPrice: portfolioPrice,
+      description: description
+    })
+  }
 })
 
 // 2. GET WATCHLIST PAGE
@@ -169,6 +214,34 @@ app.get("/remove", (req, res) => {
   res.redirect('/watchlist')
 })
 
+// 3. PORTFOLIO
+app.get("/portfolio", (req, res) => {
+
+  console.log("\nPORTFOLIO LOGS\n------------------------------------------------------------------------------------------------\n");
+  const selectRewardResult = con.query(`SELECT Reward FROM investors WHERE UserName = '${investorUsername}';`);
+  var walletprice = selectRewardResult[0]['Reward'];
+  const selectCoinSymbolResult = con.query(`SELECT CoinSymbol, BuyPrice, CoinQty FROM buycoin WHERE UserName = '${investorUsername}';`);
+  var symbols = "";
+  var qty = "";
+  var investedPrice = 0;
+  for (let i = 0; i < selectCoinSymbolResult.length; i++) {
+    symbols += selectCoinSymbolResult[i]['CoinSymbol'] + ",";
+    investedPrice += selectCoinSymbolResult[i]['BuyPrice'];
+    qty += selectCoinSymbolResult[i]['CoinQty'] + ",";
+  }
+  symbols = symbols.substring(0, symbols.length - 1);
+  qty = qty.substring(0, qty.length - 1);
+  console.log("PURCHASED COINS = " + symbols);
+  console.log("TOTAL INVESTMENT = " + investedPrice);
+  console.log("PURCHASED QTY = " + qty);
+  res.render('investor/portfolio', {
+    symbols: symbols,
+    prices: qty,
+    investedPrice: investedPrice,
+    walletprice: walletprice
+  });
+})
+
 // 5. GET INVESTOR LOGOUT
 app.get("/logout", (req, res) => {
   res.render('home');
@@ -177,6 +250,42 @@ app.get("/logout", (req, res) => {
 // *****************************************************************************
 
 //ADMIN SECTION BEGIN *****
+
+// GET ADMIN LOGIN PAGE
+app.get("/admin", (req, res) => {
+  res.render('admin/adminSign-In', {
+    failure: ''
+  })
+})
+
+// POST ADMIN LOGIN PAGE
+app.post("/admin", (req, res) => {
+
+  console.log("\ADMIN LOGIN LOGS\n------------------------------------------------------------------------------------------------\n");
+  var username = req.body.uname;
+  var password = req.body.psw;
+  console.log("ADMIN USERNAME = " + username);
+  console.log("ADMIN PASSWORD = " + password);
+  const adminResult = con.query(`SELECT AdminName, Passwrd FROM admin WHERE AdminName = '${username}';`);
+  if(adminResult.length == 1) {
+    var dbUsername = adminResult[0]['AdminName'];
+    var dbPassword = adminResult[0]['Passwrd'];
+    console.log("DB USERNAME = " + dbUsername);
+    console.log("DB PASSWORD = " + dbPassword);
+    if (dbUsername == username && dbPassword == password) {
+      console.log("LOGIN SUCCESS");
+      res.redirect('/admindb');
+    } else {
+      res.render('admin/adminSign-In', {failure:'failure'})
+      console.log("USERNAME DOESNOT EXIST");
+    }
+  } else {
+    res.render('admin/adminSign-In', {failure:'failure'})
+    console.log("USERNAME DOESNOT EXIST");
+  }
+
+})
+
 // GET ADMIN DASHBOARD PAGE
 app.get("/admindb", (req, res) => {
 
@@ -301,6 +410,13 @@ app.post("/addCoin", (req, res, next) => {
   }
 
 
+})
+
+// GET ADMIN LOGOUT
+app.get("/adminlogout", (req, res) => {
+  res.render('admin/adminSign-In', {
+    failure: ''
+  })
 })
 
 // START SERVER & LISTEN ON PORT 4438

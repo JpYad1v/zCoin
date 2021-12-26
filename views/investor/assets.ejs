@@ -55,7 +55,7 @@
             }
 
             //console.log(price["1d"].volume);
-            if (successFromApp == 'Watchlist') {
+            if (successFromApp == 'WatchlistSuccess') {
               var alertMsg = `<div class="alert alert-success alert-custom alert-dismissible fade in" role="alert" id="success-alert">
                   <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
                   ${price.name} was Added to Watchlist Successfully!
@@ -64,6 +64,11 @@
               var alertMsg = `<div class="alert alert-success alert-custom alert-dismissible fade in" role="alert" id="success-alert">
                   <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
                   You have Successfully brought ${price.name}. Please Check your portfolio to track price!
+                </div>`;
+            } else if (failureFromApp == 'WatchlistFailed') {
+              var alertMsg = `<div class="alert alert-danger alert-custom alert-dismissible fade in" role="alert" id="success-alert">
+                  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                  ${price.name} was not Added to Watchlist!
                 </div>`;
             } else if (failureFromApp == 'Failed') {
               var alertMsg = `<div class="alert alert-danger alert-custom alert-dismissible fade in" role="alert" id="success-alert">
@@ -155,21 +160,20 @@
       <a class="navbar-brand mx-auto" href="#"> <img src="./images/logo.png" width="70" height="70" alt=""> </a>
   </nav>
 
-    <nav class="nav"></nav>
+  <nav class="nav"></nav>
 
-  <nav style="position:fixed" class="top-nav">
-    <div class="side-nav">
-      <a href="investordb"><img src="./images/coins.png" alt="DASHBOARD"><br>AVAILABLE COINS</a><br>
-      <a href="watchlist"><img src="./images/watchlist.png" alt="WATCHLIST"><br>WATCHLIST</a><br>
-      <a href="portfolio"><img src="./images/portfolio.png" alt="PORTFOLIO"><br>PORTFOLIO</a><br>
-      <a href="orders"><img src="./images/orders1.png" alt="ORDERS"><br>ORDERS</a><br>
-      <a href="logout"><img src="./images/logout.png" alt="LOGOUT"><br>LOGOUT</a><br>
-    </div>
-  </nav>
-
-  <div id="asset" class="coin-info asset-design" style="top: 15%;">
+  <div class="wrapper">
+    <ul>
+      <li><a href="investordb"><img class="coins" src="./images/admin/line-graph.png" alt="INVESTOR DB"></a></li>
+      <li><a href="watchlist"><img class="coins" src="./images/watchlist.png" alt="WATCHLIST"></a></li>
+      <li><a href="portfolio"><img class="coins" src="./images/portfolio1.png" alt="PORTFOLIO"></li>
+      <li><a href="orders"><img class="coins" src="./images/orders.png" alt="ORDERS"></li>
+      <li><a href="logout"><img class="coins" src="./images/admin/logout.png" alt="LOGOUT"></a></li>
+    </ul>
   </div>
 
+  <div id="asset" class="coin-info asset-design" style="top: 20%;">
+  </div>
 
 </body>
 

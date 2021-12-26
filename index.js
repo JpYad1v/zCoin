@@ -118,24 +118,63 @@ app.post("/investorlogin", (req, res) => {
     console.log("USERNAME DOESNOT EXIST");
   }
 
-  // GET INVESTOR DASHBOARD PAGE
-  app.get("/investordb", (req, res) => {
-
-    console.log("\nINVESTOR DASHBOARD LOGS\n------------------------------------------------------------------------------------------------\n");
-    const selectCoinSymbolResult = con.query(`SELECT CoinSymbol FROM addcoin;`);
-    var dbCoins = "";
-    for (let i = 0; i < selectCoinSymbolResult.length; i++) {
-      dbCoins += selectCoinSymbolResult[i]['CoinSymbol'] + ",";
-    }
-    dbCoins = dbCoins.substring(0, dbCoins.length - 1);
-    console.log("DATABASE COINS = " + dbCoins);
-
-    res.render('investor/investor-dashboard', {
-      dbCoins: dbCoins
-    })
-  });
-
 })
+
+// 1. GET INVESTOR DASHBOARD PAGE
+app.get("/investordb", (req, res) => {
+
+  console.log("\nINVESTOR DASHBOARD LOGS\n------------------------------------------------------------------------------------------------\n");
+  const selectCoinSymbolResult = con.query(`SELECT CoinSymbol FROM addcoin;`);
+  var dbCoins = "";
+  for (let i = 0; i < selectCoinSymbolResult.length; i++) {
+    dbCoins += selectCoinSymbolResult[i]['CoinSymbol'] + ",";
+  }
+  dbCoins = dbCoins.substring(0, dbCoins.length - 1);
+  console.log("DATABASE COINS = " + dbCoins);
+
+  res.render('investor/investor-dashboard', {
+    dbCoins: dbCoins
+  })
+});
+app.get("/assets", (req, res) => {
+  res.render('investor/assets');
+})
+
+// 2. GET WATCHLIST PAGE
+app.get("/watchlist", (req, res) => {
+  console.log("\nWATCHLIST DASHBOARD LOGS\n------------------------------------------------------------------------------------------------\n");
+  const selectCoinSymbolResult = con.query(`SELECT CoinSymbol FROM watchlist WHERE UserName = '${investorUsername}';`);
+  var dbCoins = "";
+  for (let i = 0; i < selectCoinSymbolResult.length; i++) {
+    dbCoins += selectCoinSymbolResult[i]['CoinSymbol'] + ",";
+  }
+  dbCoins = dbCoins.substring(0, dbCoins.length - 1);
+  console.log("DATABASE COINS = " + dbCoins);
+
+  res.render('investor/watchlist', {
+    dbCoins: dbCoins
+  })
+})
+app.get("/remove", (req, res) => {
+
+  console.log("\nDELETE SYMBOL LOGS\n------------------------------------------------------------------------------------------------\n");
+  console.log("DELETE SYMBOL = " + req.originalUrl.split("=")[1]);
+  var deleteSymbol = req.originalUrl.split("=")[1]
+  const deleteWatchlistCoinResult = con.query(`DELETE FROM watchlist WHERE CoinSymbol = '${deleteSymbol}' AND UserName = '${investorUsername}';`);
+  if(deleteWatchlistCoinResult.affectedRows > 0) {
+    console.log(`${deleteSymbol} REMOVED SUCCESSFULLY`);
+  } else {
+    console.log(`ERROR`);
+  }
+  res.redirect('/watchlist')
+})
+
+// 5. GET INVESTOR LOGOUT
+app.get("/logout", (req, res) => {
+  res.render('home');
+})
+
+// *****************************************************************************
 
 //ADMIN SECTION BEGIN *****
 // GET ADMIN DASHBOARD PAGE
@@ -265,6 +304,6 @@ app.post("/addCoin", (req, res, next) => {
 })
 
 // START SERVER & LISTEN ON PORT 4438
-app.listen(4438, function() {
-  console.log("Server is running on port 4438.");
+app.listen(3000, function() {
+  console.log("Server is running on port 3000.");
 })

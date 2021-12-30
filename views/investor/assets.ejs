@@ -25,7 +25,7 @@
       $(".alert").fadeTo(500, 0).slideUp(500, function() {
         $(this).remove();
       });
-    }, 2000);
+    }, 4000);
   </script>
 
   <script type="text/javascript">
@@ -113,7 +113,7 @@
 
               <div class="container" style="width:100%; text-align:left;">
 
-              <form action="/buysell" method="post">
+              <form action="/buy" method="post">
                 <label class="label-login" for="uname"><b>Buy</b></label>
                 <input type="text" placeholder="Enter Price to buy, NOTE: Current Coin Price may vary based on market price" name="price" autocomplete="off" required>
                 <input type="hidden" name="symbol" value="${price.symbol}">

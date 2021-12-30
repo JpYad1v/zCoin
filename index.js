@@ -184,6 +184,69 @@ app.post("/assets", (req, res) => {
     })
   }
 })
+// POST BUY COIN
+app.post("/buy", (req, res) => {
+
+  console.log("\nBUY COIN LOGS\n------------------------------------------------------------------------------------------------\n");
+  var buyPriceFromInvestor = req.body.price;
+  console.log("BUY PRICE FROM INVESTOR = " + buyPriceFromInvestor);
+  var buyCoinSymbol = req.body.symbol;
+  console.log("BUY COIN SYMBOL = " + buyCoinSymbol);
+  const selectWalletPriceResult = con.query(`SELECT Reward FROM investors WHERE UserName = '${investorUsername}';`);
+  var investorWalletPrice = selectWalletPriceResult[0]['Reward']
+  console.log("INVESTOR WALLET PRICE = " + investorWalletPrice);
+  var currentCoinSymbolPrice = nomicsCoin.getPrice(buyCoinSymbol);
+  console.log("CURRENT COIN PRICE = " + currentCoinSymbolPrice);
+  var coinSymbolRank = nomicsCoin.getRank(buyCoinSymbol);
+  console.log("COIN RANK = " + coinSymbolRank);
+  var description = nomicsCoin.getDescription(buyCoinSymbol);
+
+  // LOGIC
+  if (buyPriceFromInvestor > investorWalletPrice) {
+    // NO SUFFICIENT BALANCE
+    console.log("YOU DO NOT HAVE SUFFICIENT BALACE TO BUY THE COIN");
+    res.render('investor/assets', {
+      symbol: buyCoinSymbol,
+      success: '',
+      failure: 'Failed',
+      portfolioPrice: investorWalletPrice,
+      description: description
+    })
+  } else {
+    // BUY COIN =
+    // 1. INSERT RECORD INTO DB - CALCULATE COIN QTY
+    var coinQty = buyPriceFromInvestor / currentCoinSymbolPrice;
+    const insertCoinQtyResult = con.query(`INSERT INTO buycoin (UserName, CoinSymbol, BuyPrice, CoinQty, rank, BuyCoinID) VALUES ('${investorUsername}', '${buyCoinSymbol}', '${buyPriceFromInvestor}', '${coinQty}', '${coinSymbolRank}', ${1})`);
+    var updatedInvestorWalletPrice = investorWalletPrice - buyPriceFromInvestor;
+    if (insertCoinQtyResult.affectedRows > 0) {
+      // 2. UPDATE REWARD
+      const updateRewardResult = con.query(`UPDATE investors SET Reward = '${updatedInvestorWalletPrice}' WHERE UserName = '${investorUsername}';`);
+      if (updateRewardResult.affectedRows > 0) {
+        console.log("UPDATED INVESTOR REWARD !");
+      } else {
+        console.log("ERROR !");
+      }
+      res.render('investor/assets', {
+        symbol: buyCoinSymbol,
+        success: 'Success',
+        failure: '',
+        portfolioPrice: updatedInvestorWalletPrice,
+        description: description
+      })
+      console.log("RECORDED INSERTED - BUY COIN SUCCESSFULL !");
+    } else {
+      console.log("ERROR !");
+      res.render('investor/assets', {
+        symbol: buyCoinSymbol,
+        success: '',
+        failure: 'Failed',
+        portfolioPrice: investorWalletPrice,
+        description: description
+      })
+    }
+
+  }
+})
 
 // 2. GET WATCHLIST PAGE
 app.get("/watchlist", (req, res) => {
@@ -220,7 +283,7 @@ app.get("/portfolio", (req, res) => {
   console.log("\nPORTFOLIO LOGS\n------------------------------------------------------------------------------------------------\n");
   const selectRewardResult = con.query(`SELECT Reward FROM investors WHERE UserName = '${investorUsername}';`);
   var walletprice = selectRewardResult[0]['Reward'];
-  const selectCoinSymbolResult = con.query(`SELECT CoinSymbol, BuyPrice, CoinQty FROM buycoin WHERE UserName = '${investorUsername}';`);
+  const selectCoinSymbolResult = con.query(`SELECT CoinSymbol, BuyPrice, CoinQty FROM buycoin WHERE UserName = '${investorUsername}' ORDER BY rank ASC;`);
   var symbols = "";
   var qty = "";
   var investedPrice = 0;
@@ -423,3 +486,9 @@ app.get("/adminlogout", (req, res) => {
 app.listen(3000, function() {
   console.log("Server is running on port 3000.");
 })
+
+// LAST ADDED RECORD
+// SELECT CoinSymbol FROM addcoin WHERE CurrentTimeStamp = (SELECT min(CurrentTimeStamp) FROM addcoin); ONLY 1 RECORD
+
+// GET LATEST RECORDS WITHOUT USING // ID
+// SELECT CoinSymbol FROM addcoin ORDER BY CurrentTimeStamp DESC LIMIT 5;

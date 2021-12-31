@@ -28,6 +28,8 @@
     }, 2000);
   </script>
 
+
+
   <script type="text/javascript">
     var symbol = "<%= symbol %>";
     var successFromApp = "<%= success %>";
@@ -107,8 +109,9 @@
 
               <form action="/sell" method="post">
                 <label class="label-login" for="uname"><b>Sell</b></label>
-                <button onclick="document.getElementById("hundredPercent").value = "Johnny Bravo";" style="background-color: #5D1BF8; padding:5px; border-radius:5px; border-color: #5D1BF8">100%</button> <br> <br>
-                <input type="text" id="hundredPercent" placeholder="Enter Price to sell, NOTE: Current Coin Price may vary based on market price" name="price" autocomplete="off" required>
+
+                <input type="text" id="hPercent" placeholder="Enter Price to sell, NOTE: Current Coin Price may vary based on market price" name="price" autocomplete="off" required>
+
                 <input type="hidden" name="symbol" value="${price.symbol}">
 
                 <div style="text-align:center;">
@@ -165,7 +168,11 @@
   <div id="asset" class="coin-info asset-design" style="top: 20%;">
   </div>
 
-
+  <script type="text/javascript">
+    function hundredPercent() {
+      document.getElementById("hPercent").value = "Johnny Bravo";
+    }
+  </script>
 </body>
 
 </html>

@@ -392,6 +392,56 @@ app.get("/sell", (req, res) => {
     totalQty: totalQty
   });
 })
+app.post("/sell", (req, res) => {
+  var sellPrice = req.body.sell;
+  var sellSymbol = req.body.symbol;
+  console.log("SELL PRICE = " + sellPrice);
+  console.log("SELL SYMBOL = " + sellSymbol);
+
+  const coinQtyResult = con.query(`SELECT BuyPrice, CoinQty FROM buycoin WHERE UserName = '${investorUsername}' AND CoinSymbol = '${sellSymbol}';`)
+  var coinQty = coinQtyResult[0]['CoinQty'];
+  var buyPrice = coinQtyResult[0]['BuyPrice'];
+  console.log("COIN QTY = " + coinQty);
+  console.log("BUY PRICE = " + buyPrice);
+
+  var currentPrice = nomicsCoin.getPrice(sellSymbol);
+  var totalWorth = currentPrice * coinQty;
+
+  var totalSellCoins = sellPrice / currentPrice;
+
+  // IF INPUT PRICE IS MORE THAN THE TOTAL WORTH - YOU TOTAL WORTH IS LESS THAN THE INPUT PRICE - YOU CANNOT SELL THE COIN
+  if (sellPrice > totalWorth) {
+    console.log("Your Do not own Sufficient Coins to Sell");
+  }
+  // SELL THE COIN
+  else {
+    // CALCULATE THE COINS THAT THE USER WANTS TO SELL
+
+    // Minus the CoinQty in the buycoin
+    // Minus the BuyPrice in the buycoin
+    // Create new table = sellCoin {UserName, CoinSymbol, SellPrice, CoinQty}
+    // Update the Rewards
+    var updatedBuyPrice = buyPrice - sellPrice;
+    var updatedCoinQty = coinQty - totalSellCoins;
+    const updateBuyCoinResult = con.query(`UPDATE buycoin SET BuyPrice = ${updatedBuyPrice}, CoinQty = ${updatedCoinQty}  WHERE CoinSymbol = '${sellSymbol}' AND UserName = '${investorUsername}';`);
+    if (updateBuyCoinResult.affectedRows > 0) {
+      console.log("BUY COIN TABLE SUCCESSFULLY UPDATED");
+      // UPDATE REWARD
+      const investorRewardResult = con.query(`SELECT Reward FROM investors WHERE UserName = '${investorUsername}'`);
+      var reward = investorRewardResult[0]['Reward'];
+      var updatedReward = reward + sellPrice;
+      const updateBuyCoinResult = con.query(`UPDATE investors SET Reward = ${updatedReward} WHERE UserName = '${investorUsername}';`);
+    } else {
+      console.log("ERROR");
+    }
+    const insertSellCoinResult = con.query(`INSERT INTO sellcoin (UserName, CoinSymbol, SellPrice, CoinQty) VALUES ('${investorUsername}', '${sellSymbol}', '${sellPrice}', '${totalSellCoins}');`);
+    if (insertSellCoinResult.affectedRows > 0) {
+      console.log("SUCCESSFULLY INSERTED");
+      console.log("ERROR");
+    } else {
+    }
+  }
+})
 
 // 5. GET INVESTOR LOGOUT
 app.get("/logout", (req, res) => {

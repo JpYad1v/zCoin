@@ -200,6 +200,12 @@ app.post("/buy", (req, res) => {
   var coinSymbolRank = nomicsCoin.getRank(buyCoinSymbol);
   console.log("COIN RANK = " + coinSymbolRank);
   var description = nomicsCoin.getDescription(buyCoinSymbol);
+  const existingCoinSymbolsResult = con.query(`SELECT CoinSymbol FROM buycoin WHERE UserName = '${investorUsername}';`);
+  var existingCoinSymbols = [];
+  for (let i = 0; i < existingCoinSymbolsResult.length; i++) {
+    existingCoinSymbols.push(existingCoinSymbolsResult[i]['CoinSymbol']);
+  }
+  console.log("EXISTING SYMBOLS IN DB = " + existingCoinSymbols);
 
   // LOGIC
   if (buyPriceFromInvestor > investorWalletPrice) {
@@ -213,38 +219,89 @@ app.post("/buy", (req, res) => {
       description: description
     })
   } else {
-    // BUY COIN =
-    // 1. INSERT RECORD INTO DB - CALCULATE COIN QTY
-    var coinQty = buyPriceFromInvestor / currentCoinSymbolPrice;
-    const insertCoinQtyResult = con.query(`INSERT INTO buycoin (UserName, CoinSymbol, BuyPrice, CoinQty, rank, BuyCoinID) VALUES ('${investorUsername}', '${buyCoinSymbol}', '${buyPriceFromInvestor}', '${coinQty}', '${coinSymbolRank}', ${1})`);
-    var updatedInvestorWalletPrice = investorWalletPrice - buyPriceFromInvestor;
-    if (insertCoinQtyResult.affectedRows > 0) {
-      // 2. UPDATE REWARD
-      const updateRewardResult = con.query(`UPDATE investors SET Reward = '${updatedInvestorWalletPrice}' WHERE UserName = '${investorUsername}';`);
-      if (updateRewardResult.affectedRows > 0) {
-        console.log("UPDATED INVESTOR REWARD !");
+    // IF COIN SYMBOL ALREADY EXIST IN THE DB - WE NEED TO UPDATE THE COINQTY & BUYPRICE
+    if (existingCoinSymbols.includes(buyCoinSymbol)) {
+      console.log("COIN EXIST IN THE DB - PERFORM UPDATE OPERATION");
+      // GET BUY PRICE & COIN QTY FROM DB THAT ALREADY EXISTS
+      const symbolPriceQtyResult = con.query(`SELECT BuyPrice, CoinQty FROM buycoin WHERE CoinSymbol = '${buyCoinSymbol}' AND UserName = '${investorUsername}';`);
+      var existingBuyPrice = 0;
+      var existingCoinQty = 0;
+      for (let i = 0; i < symbolPriceQtyResult.length; i ++) {
+        existingBuyPrice += symbolPriceQtyResult[0]['BuyPrice'];
+        existingCoinQty += symbolPriceQtyResult[0]['CoinQty'];
+      }
+      console.log("EXISTING BUY PRICE = " + existingBuyPrice);
+      console.log("EXISTING COIN QTY = " + existingCoinQty);
+
+      var coinQty = buyPriceFromInvestor / currentCoinSymbolPrice;
+      var updatedCoinQty = existingCoinQty + coinQty;
+      var updatedBuyPrice = existingBuyPrice + parseInt(buyPriceFromInvestor);
+
+      console.log("UPDATED BUY PRICE = " + updatedBuyPrice);
+      console.log("UPDATED COIN QTY = " + updatedCoinQty);
+
+      const updateBuyCoinResult = con.query(`UPDATE buycoin SET BuyPrice = ${updatedBuyPrice}, CoinQty = ${updatedCoinQty}  WHERE CoinSymbol = '${buyCoinSymbol}' AND UserName = '${investorUsername}';`);
+      if (updateBuyCoinResult.affectedRows > 0){
+        console.log("Coin Purchased Successfully");
+        var updatedInvestorWalletPrice = investorWalletPrice - buyPriceFromInvestor;
+        const updateRewardResult = con.query(`UPDATE investors SET Reward = '${updatedInvestorWalletPrice}' WHERE UserName = '${investorUsername}';`);
+        if (updateRewardResult.affectedRows > 0) {
+          console.log("UPDATED INVESTOR REWARD !");
+          res.render('investor/assets', {
+            symbol: buyCoinSymbol,
+            success: 'Success',
+            failure: '',
+            portfolioPrice: updatedInvestorWalletPrice,
+            description: description
+          })
+        } else {
+          console.log("ERROR !");
+        }
       } else {
         console.log("ERROR !");
+        res.render('investor/assets', {
+          symbol: buyCoinSymbol,
+          success: '',
+          failure: 'Failed',
+          portfolioPrice: investorWalletPrice,
+          description: description
+        })
       }
-      res.render('investor/assets', {
-        symbol: buyCoinSymbol,
-        success: 'Success',
-        failure: '',
-        portfolioPrice: updatedInvestorWalletPrice,
-        description: description
-      })
-      console.log("RECORDED INSERTED - BUY COIN SUCCESSFULL !");
-    } else {
-      console.log("ERROR !");
-      res.render('investor/assets', {
-        symbol: buyCoinSymbol,
-        success: '',
-        failure: 'Failed',
-        portfolioPrice: investorWalletPrice,
-        description: description
-      })
     }
-
+    // ELSE WE NEED TO PERFROM AN INSERT DB
+    else {
+      // BUY COIN =
+      // 1. INSERT RECORD INTO DB - CALCULATE COIN QTY
+      var coinQty = buyPriceFromInvestor / currentCoinSymbolPrice;
+      const insertCoinQtyResult = con.query(`INSERT INTO buycoin (UserName, CoinSymbol, BuyPrice, CoinQty, rank, BuyCoinID) VALUES ('${investorUsername}', '${buyCoinSymbol}', '${buyPriceFromInvestor}', '${coinQty}', '${coinSymbolRank}', ${1})`);
+      var updatedInvestorWalletPrice = investorWalletPrice - buyPriceFromInvestor;
+      if (insertCoinQtyResult.affectedRows > 0) {
+        // 2. UPDATE REWARD
+        const updateRewardResult = con.query(`UPDATE investors SET Reward = '${updatedInvestorWalletPrice}' WHERE UserName = '${investorUsername}';`);
+        if (updateRewardResult.affectedRows > 0) {
+          console.log("UPDATED INVESTOR REWARD !");
+        } else {
+          console.log("ERROR !");
+        }
+        res.render('investor/assets', {
+          symbol: buyCoinSymbol,
+          success: 'Success',
+          failure: '',
+          portfolioPrice: updatedInvestorWalletPrice,
+          description: description
+        })
+        console.log("RECORDED INSERTED - BUY COIN SUCCESSFULL !");
+      } else {
+        console.log("ERROR !");
+        res.render('investor/assets', {
+          symbol: buyCoinSymbol,
+          success: '',
+          failure: 'Failed',
+          portfolioPrice: investorWalletPrice,
+          description: description
+        })
+      }
+    }
   }
 })
 
@@ -286,22 +343,32 @@ app.get("/portfolio", (req, res) => {
   const selectCoinSymbolResult = con.query(`SELECT CoinSymbol, BuyPrice, CoinQty FROM buycoin WHERE UserName = '${investorUsername}' ORDER BY rank ASC;`);
   var symbols = "";
   var qty = "";
+  var buyPrice = "";
+  var avgBuyPrice = "";
   var investedPrice = 0;
   for (let i = 0; i < selectCoinSymbolResult.length; i++) {
     symbols += selectCoinSymbolResult[i]['CoinSymbol'] + ",";
     investedPrice += selectCoinSymbolResult[i]['BuyPrice'];
+    buyPrice += selectCoinSymbolResult[i]['BuyPrice'] + ",";
     qty += selectCoinSymbolResult[i]['CoinQty'] + ",";
+    avgBuyPrice += (selectCoinSymbolResult[i]['BuyPrice'] / selectCoinSymbolResult[i]['CoinQty']).toFixed(2) + ",";
   }
   symbols = symbols.substring(0, symbols.length - 1);
   qty = qty.substring(0, qty.length - 1);
+  buyPrice = buyPrice.substring(0, buyPrice.length - 1);
   console.log("PURCHASED COINS = " + symbols);
-  console.log("TOTAL INVESTMENT = " + investedPrice);
+  console.log("BUY PRICES = " + buyPrice);
   console.log("PURCHASED QTY = " + qty);
+  console.log("AVERAGE BUY PRICE = " + avgBuyPrice);
+  console.log("TOTAL INVESTMENT = " + investedPrice);
+
   res.render('investor/portfolio', {
     symbols: symbols,
     prices: qty,
     investedPrice: investedPrice,
-    walletprice: walletprice
+    walletprice: walletprice,
+    buyPrice: buyPrice,
+    avgBuyPrice: avgBuyPrice
   });
 })
 

@@ -393,7 +393,7 @@ app.get("/sell", (req, res) => {
   });
 })
 app.post("/sell", (req, res) => {
-  var sellPrice = req.body.sell;
+  var sellPrice = req.body.price;
   var sellSymbol = req.body.symbol;
   console.log("SELL PRICE = " + sellPrice);
   console.log("SELL SYMBOL = " + sellSymbol);
@@ -406,12 +406,30 @@ app.post("/sell", (req, res) => {
 
   var currentPrice = nomicsCoin.getPrice(sellSymbol);
   var totalWorth = currentPrice * coinQty;
+  console.log("CURRENT PRICE = " + currentPrice);
+  console.log("TOTAL WORTH = " + totalWorth);
 
   var totalSellCoins = sellPrice / currentPrice;
+  console.log("SELL COIN QTY = " + totalSellCoins);
 
   // IF INPUT PRICE IS MORE THAN THE TOTAL WORTH - YOU TOTAL WORTH IS LESS THAN THE INPUT PRICE - YOU CANNOT SELL THE COIN
   if (sellPrice > totalWorth) {
     console.log("Your Do not own Sufficient Coins to Sell");
+
+    const rewardPriceResult = con.query(`SELECT Reward FROM investors WHERE UserName = '${investorUsername}';`);
+    console.log("PORTFOLIO PRICE = " + rewardPriceResult[0]['Reward']);
+    var portfolioPrice = rewardPriceResult[0]['Reward'];
+    const totalQtyResult = con.query(`SELECT CoinQty FROM buycoin WHERE CoinSymbol = '${sellSymbol}' AND UserName = '${investorUsername}';`);
+    console.log("TOTAL QTY = " + totalQtyResult[0]['CoinQty']);
+    var totalQty = totalQtyResult[0]['CoinQty'];
+
+    res.render('investor/sell', {
+      symbol : sellSymbol,
+      success : '',
+      failure: 'Failed',
+      portfolioPrice: portfolioPrice,
+      totalQty: totalQty
+    });
   }
   // SELL THE COIN
   else {
@@ -429,17 +447,70 @@ app.post("/sell", (req, res) => {
       // UPDATE REWARD
       const investorRewardResult = con.query(`SELECT Reward FROM investors WHERE UserName = '${investorUsername}'`);
       var reward = investorRewardResult[0]['Reward'];
-      var updatedReward = reward + sellPrice;
+      var updatedReward = parseInt(reward) + parseInt(sellPrice);
       const updateBuyCoinResult = con.query(`UPDATE investors SET Reward = ${updatedReward} WHERE UserName = '${investorUsername}';`);
+      if (updateBuyCoinResult.affectedRows > 0) {
+        console.log("UPDATED THE INVESTORS REWARD");
+
+        const rewardPriceResult = con.query(`SELECT Reward FROM investors WHERE UserName = '${investorUsername}';`);
+        console.log("PORTFOLIO PRICE = " + rewardPriceResult[0]['Reward']);
+        var portfolioPrice = rewardPriceResult[0]['Reward'];
+        const totalQtyResult = con.query(`SELECT CoinQty FROM buycoin WHERE CoinSymbol = '${sellSymbol}' AND UserName = '${investorUsername}';`);
+        console.log("TOTAL QTY = " + totalQtyResult[0]['CoinQty']);
+        var totalQty = totalQtyResult[0]['CoinQty'];
+
+        res.render('investor/sell', {
+          symbol : sellSymbol,
+          success : 'Success',
+          failure: '',
+          portfolioPrice: portfolioPrice,
+          totalQty: totalQty
+        });
+      } else {
+
+        const rewardPriceResult = con.query(`SELECT Reward FROM investors WHERE UserName = '${investorUsername}';`);
+        console.log("PORTFOLIO PRICE = " + rewardPriceResult[0]['Reward']);
+        var portfolioPrice = rewardPriceResult[0]['Reward'];
+        const totalQtyResult = con.query(`SELECT CoinQty FROM buycoin WHERE CoinSymbol = '${sellSymbol}' AND UserName = '${investorUsername}';`);
+        console.log("TOTAL QTY = " + totalQtyResult[0]['CoinQty']);
+        var totalQty = totalQtyResult[0]['CoinQty'];
+
+        console.log("ERROR - UPDATING REWARD TABLE");
+        res.render('investor/sell', {
+          symbol : sellSymbol,
+          success : '',
+          failure: 'Failed',
+          portfolioPrice: portfolioPrice,
+          totalQty: totalQty
+        });
+      }
     } else {
-      console.log("ERROR");
+
+      const rewardPriceResult = con.query(`SELECT Reward FROM investors WHERE UserName = '${investorUsername}';`);
+      console.log("PORTFOLIO PRICE = " + rewardPriceResult[0]['Reward']);
+      var portfolioPrice = rewardPriceResult[0]['Reward'];
+      const totalQtyResult = con.query(`SELECT CoinQty FROM buycoin WHERE CoinSymbol = '${sellSymbol}' AND UserName = '${investorUsername}';`);
+      console.log("TOTAL QTY = " + totalQtyResult[0]['CoinQty']);
+      var totalQty = totalQtyResult[0]['CoinQty'];
+
+      console.log("ERROR - UPDATING BUY COIN");
+      res.render('investor/sell', {
+        symbol : sellSymbol,
+        success : '',
+        failure: 'Failed',
+        portfolioPrice: portfolioPrice,
+        totalQty: totalQty
+      });
     }
+
+    // INSERT RECORD INTO THE SELL COIN TABLE
     const insertSellCoinResult = con.query(`INSERT INTO sellcoin (UserName, CoinSymbol, SellPrice, CoinQty) VALUES ('${investorUsername}', '${sellSymbol}', '${sellPrice}', '${totalSellCoins}');`);
     if (insertSellCoinResult.affectedRows > 0) {
       console.log("SUCCESSFULLY INSERTED");
-      console.log("ERROR");
     } else {
+      console.log("COULD NOT INSERT RECORD INTO THE SELL COIN TABLE");
     }
+
   }
 })
 

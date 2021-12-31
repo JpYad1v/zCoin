@@ -60,12 +60,12 @@
             } else if (successFromApp == 'Success') {
               var alertMsg = `<div class="alert alert-success alert-custom alert-dismissible fade in" role="alert" id="success-alert">
                   <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                  You have Successfully brought ${price.name}. Please Check your portfolio to track price!
+                  You have Successfully Sold ${price.name}.
                 </div>`;
             } else if (failureFromApp == 'Failed') {
               var alertMsg = `<div class="alert alert-danger alert-custom alert-dismissible fade in" role="alert" id="success-alert">
                   <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                  It seems you dont have sufficient balance to buy in your wallet to buy ${price.name}!
+                  YOU TOTAL WORTH IS LESS THAN THE INPUT PRICE - YOU CANNOT SELL ${price.name}!
                 </div>`;
             } else {
               var alertMsg = '';

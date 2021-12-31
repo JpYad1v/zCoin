@@ -36,21 +36,14 @@
     var prices = "<%= prices %>";
     var avgBuyPrice = "<%= avgBuyPrice %>";
     var totalBuyPrice = "<%= buyPrice %>"
-    console.log(symbols);
-    console.log(prices);
-    console.log(avgBuyPrice);
-    console.log(totalBuyPrice);
 
     symbols = symbols.split(',');
     prices = prices.split(',');
     avgBuyPrice = avgBuyPrice.split(',');
     totalBuyPrice = totalBuyPrice.split(',');
-    console.log(symbols);
-    console.log(prices);
-    console.log(avgBuyPrice);
-    console.log(totalBuyPrice);
 
     function getData() {
+      console.log("GET DATA LOOP RUNNING");
       const url = "https://api.nomics.com/v1/currencies/ticker?key=1f72151d3ea004f9305149cabf5698b386786850&ids=" + symbols + "&interval=1d,30d&convert=INR&per-page=100&page=1";
       fetch(url)
         .then(response => response.json())
@@ -95,6 +88,7 @@
     setInterval(getData, 10000);
 
     function investedCoins() {
+      console.log("INVESTED COINS LOOP RUNNING");
       const url = "https://api.nomics.com/v1/currencies/ticker?key=1f72151d3ea004f9305149cabf5698b386786850&ids=" + symbols + "&interval=1d,30d&convert=INR&per-page=100&page=1";
       fetch(url)
         .then(response => response.json())
@@ -105,39 +99,36 @@
             //console.log("COIN = " + price.symbol);
             //console.log("QTY = " + prices[i]);
             i += 1;
-            if ((price.price - avgBuyPrice[i]) * prices[i] > 0){
-              returns = `<p style="color:lightgreen">Returns : ${(price.price - avgBuyPrice[i]) * prices[i]}</p>`;
-
+            var returns = (price.price - avgBuyPrice[i]) * prices[i];
+            returns = returns.toFixed(2);
+            if (returns > 0){
+              returns = `<p style="color:lightgreen">Returns : ${returns}</p>`;
             }
             else {
-              returns = `<p style="color:red">RETURNS : ${(price.price - avgBuyPrice[i]) * prices[i]}</p>`;
-
+              returns = `<p style="color:red">RETURNS : ${returns}</p>`;
             }
+
             return `
             <center>
+
               <img class="crypto-coins" src="${price.logo_url}" alt="CRYPTO_COIN">
               <br><br>
               <p> ${price.name} </p>
               <p> Qty : ${prices[i]} </p>
-              <p> AVERAGE BUYING PRICE : ${avgBuyPrice[i]} &emsp; CURRENT BUYING PRICE : &#x20B9; ${price.price} </p>
 
-              <p> INVESTED : ${totalBuyPrice[i]} &emsp; CURRENT : ${prices[i] * price.price} </p>
-
+              <p> AVERAGE BUYING PRICE : ${avgBuyPrice[i]} &emsp; CURRENT BUYING PRICE : &#x20B9; ${parseFloat(price.price).toFixed(2)} </p>
+              <p> INVESTED : ${totalBuyPrice[i]} &emsp; CURRENT : ${parseFloat(prices[i] * price.price).toFixed(2)} </p>
               <p>  ${returns}</p>
 
               <a href="sell?symbol=${price.symbol}"> <button class="btn-sell">Sell</button> </a>
-
               <br>
               <hr style="height:1px;border-width:0;color:gray;background-color:#000">
+
             </center>
             `;
-
-
-
           }).join("");
-          console.log(html);
 
-          document.querySelector('#coinInvested').innerHTML = `<center><h4>INVESTED COINS</h4></center><hr style="height:1px;border-width:0;color:gray;background-color:#000">` + html;
+          document.querySelector('#coinInvested').innerHTML = `<center><h4>Invested Coins</h4></center><hr style="height:1px;border-width:0;color:gray;background-color:#000">` + html;
         })
     }
 
@@ -171,8 +162,9 @@
   <!-- Investor Sign in -->
 
   <div class="sign-in">
-
+    <center><h4>My Investments</h4></center> <br>
     <div class="wallet" style="box-shadow: 0 5px 15px rgb(93 27 248 / 50%); padding: 20px; width:50%; margin:auto;">
+
       <h4 style="text-align:center; line-height: 1.6;">WALLET PRICE <br> &#x20B9; <%= walletprice %> </h4>
       <br>
       <div style="display:flex; justify-content:space-between; margin-left: 20%; margin-right: 30%;">

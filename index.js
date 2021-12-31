@@ -106,7 +106,8 @@ app.post("/investorlogin", (req, res) => {
       console.log("DATABASE COINS = " + dbCoins);
 
       res.render('investor/investor-dashboard', {
-        dbCoins: dbCoins
+        dbCoins: dbCoins,
+        username: investorUsername
       });
 
     } else {
@@ -133,7 +134,8 @@ app.get("/investordb", (req, res) => {
   console.log("DATABASE COINS = " + dbCoins);
 
   res.render('investor/investor-dashboard', {
-    dbCoins: dbCoins
+    dbCoins: dbCoins,
+    username: investorUsername
   })
 });
 // GET ASSETS PAGE
@@ -369,6 +371,25 @@ app.get("/portfolio", (req, res) => {
     walletprice: walletprice,
     buyPrice: buyPrice,
     avgBuyPrice: avgBuyPrice
+  });
+})
+app.get("/sell", (req, res) => {
+
+  console.log("\SELL COIN LOGS\n------------------------------------------------------------------------------------------------\n");
+  console.log("SELL SYMBOL = " + req.originalUrl.split("=")[1]);
+  var sellSymbol = req.originalUrl.split("=")[1];
+  const rewardPriceResult = con.query(`SELECT Reward FROM investors WHERE UserName = '${investorUsername}';`);
+  console.log("PORTFOLIO PRICE = " + rewardPriceResult[0]['Reward']);
+  var portfolioPrice = rewardPriceResult[0]['Reward'];
+  const totalQtyResult = con.query(`SELECT CoinQty FROM buycoin WHERE CoinSymbol = '${sellSymbol}' AND UserName = '${investorUsername}';`);
+  console.log("TOTAL QTY = " + totalQtyResult[0]['CoinQty']);
+  var totalQty = totalQtyResult[0]['CoinQty'];
+  res.render('investor/sell', {
+    symbol : sellSymbol,
+    success : '',
+    failure: '',
+    portfolioPrice: portfolioPrice,
+    totalQty: totalQty
   });
 })
 

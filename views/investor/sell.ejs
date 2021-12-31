@@ -107,9 +107,12 @@
 
               <form action="/sell" method="post">
                 <label class="label-login" for="uname"><b>Sell</b></label>
-                <input type="text" placeholder="Enter Price to sell, NOTE: Current Coin Price may vary based on market price" name="price" autocomplete="off" required>
+                <button onclick="document.getElementById("hundredPercent").value = "Johnny Bravo";" style="background-color: #5D1BF8; padding:5px; border-radius:5px; border-color: #5D1BF8">100%</button> <br> <br>
+                <input type="text" id="hundredPercent" placeholder="Enter Price to sell, NOTE: Current Coin Price may vary based on market price" name="price" autocomplete="off" required>
                 <input type="hidden" name="symbol" value="${price.symbol}">
+
                 <div style="text-align:center;">
+
                 <button name="btntype" value="sell" class="home-button">Sell</button>
                 <!--<button name="btntype" value="sell" class="home-button login">Sell</button>-->
                 </div>
@@ -149,17 +152,17 @@
 
     <nav class="nav"></nav>
 
-  <nav style="position:fixed" class="top-nav">
-    <div class="side-nav">
-      <a href="investordb"><img src="./images/coins.png" alt="DASHBOARD"><br>AVAILABLE COINS</a><br>
-      <a href="watchlist"><img src="./images/watchlist.png" alt="WATCHLIST"><br>WATCHLIST</a><br>
-      <a href="portfolio"><img src="./images/portfolio.png" alt="PORTFOLIO"><br>PORTFOLIO</a><br>
-      <a href="orders"><img src="./images/orders1.png" alt="ORDERS"><br>ORDERS</a><br>
-      <a href="logout"><img src="./images/logout.png" alt="LOGOUT"><br>LOGOUT</a><br>
+    <div class="wrapper">
+      <ul>
+        <li><a href="investordb"><img class="coins" src="./images/admin/line-graph.png" alt="INVESTOR DB"></a></li>
+        <li><a href="watchlist"><img class="coins" src="./images/watchlist.png" alt="WATCHLIST"></a></li>
+        <li><a href="portfolio"><img class="coins" src="./images/portfolio1.png" alt="PORTFOLIO"></li>
+        <li><a href="orders"><img class="coins" src="./images/orders.png" alt="ORDERS"></li>
+        <li><a href="logout"><img class="coins" src="./images/admin/logout.png" alt="LOGOUT"></a></li>
+      </ul>
     </div>
-  </nav>
 
-  <div id="asset" class="coin-info asset-design" style="top: 15%;">
+  <div id="asset" class="coin-info asset-design" style="top: 20%;">
   </div>
 
 

@@ -33,7 +33,7 @@
   </nav>
 
   <nav class="nav"></nav>
-  
+
   <div class="wrapper">
     <ul>
       <li><a href="investordb"><img class="coins" src="./images/admin/line-graph.png" alt="INVESTOR DB"></a></li>
@@ -90,6 +90,7 @@
   </script>
   <script type="text/javascript">
     var dbCoins = "<%= dbCoins %>";
+    var username = "<%= username %>";
     //dbCoins = dbCoinsfromNodejs.substring(0, dbCoinsfromNodejs.length - 1);
 
     // SPINNER
@@ -126,11 +127,11 @@
 
           //$('#crypto').html(html);
           document.querySelector('#crypto').innerHTML =
-            '<table class="table"><center><h4>Todays cryptocurrency prices from  <span style="color: #5D1BF8"> Nomics  | ZeroCoin </span></h4></center> <br> <thead class="thread-light"><tr><th scope="col"></th><th scope="col">SYMBOL</th><th scope="col">PRICE</th><th scope="col">24H CHANGE</th><th scope="col">RANK</th></tr></thead><tbody>' + html + '</tbody></table>';
+            '<table class="table"><center><h4><img src="./images/chat.png" height="40px" width="40px" alt="Hi"> &ensp;' + username + '</h4><br><h4>Todays cryptocurrency prices from  <span style="color: #5D1BF8"> Nomics  | ZeroCoin </span></h4></center> <br> <thead class="thread-light"><tr><th scope="col"></th><th scope="col">SYMBOL</th><th scope="col">PRICE</th><th scope="col">24H CHANGE</th><th scope="col">RANK</th></tr></thead><tbody>' + html + '</tbody></table>';
         })
     }
-    //getData();
-    setInterval(getData, 1000);
+    getData();
+    setInterval(getData, 10000);
   </script>
 
 </body>

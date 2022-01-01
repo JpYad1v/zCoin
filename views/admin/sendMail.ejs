@@ -65,33 +65,18 @@
     </div>
     <% } %>
 
-    <% if (successDel != '') { %>
-    <div class="alert alert-success alert-custom alert-dismissible fade in" role="alert" id="success-alert">
-      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-      Coin Deleted Successfully!
-    </div>
-    <% } %>
-
-    <% if (failureDel != '') { %>
-    <div class="alert alert-danger alert-custom alert-dismissible fade in" role="alert" id="success-alert">
-      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-      The Coin you have entered is not in the Database.
-    </div>
-    <% } %>
-
     <form action="/addCoin" method="post">
 
       <div class="imgcontainer">
-        <img src="./images/admin/piggy-bank.png" alt="Avatar" class="avatar">
+        <img src="./images/admin/plane.png" alt="Avatar" class="avatar">
       </div>
 
       <div class="container" style="width:100%;">
-        <label class="label-login" for="uname"><b>Coin Symbol</b></label>
-        <input type="text" placeholder="Enter Coin Symbol" name="newcoin" autocomplete="off" required>
+        <label class="label-login" for="uname"><b>Announcement</b></label>
+        <input type="text" placeholder="Announcement" name="newcoin" autocomplete="off" required>
 
         <div style="text-align:center;">
-          <button style="margin-left:-20px;" name="btntype" value="add" class="home-button">Add Coin</button>
-          <button name="btntype" value="remove" class="home-button login">Remove Coin</button>
+          <button style="margin-left:-20px;" name="btntype" value="add" class="home-button">Post</button>
         </div>
         <!--<button class="home-button login-button" type="submit">Add Coin</button>-->
       </div>

@@ -684,6 +684,14 @@ app.post("/addCoin", (req, res, next) => {
 
 })
 
+// SEND MAIL SECTION
+app.get("/sendMail", (req, res) => {
+  res.render('admin/sendMail', {
+    success: '',
+    failure: ''
+  });
+})
+
 // GET ADMIN LOGOUT
 app.get("/adminlogout", (req, res) => {
   res.render('admin/adminSign-In', {
@@ -701,3 +709,6 @@ app.listen(3000, function() {
 
 // GET LATEST RECORDS WITHOUT USING // ID
 // SELECT CoinSymbol FROM addcoin ORDER BY CurrentTimeStamp DESC LIMIT 5;
+
+// ORDERS
+// USERNAME - Buy/Sell - SYMBOL - PRICE - QTY - TIMESTAMP

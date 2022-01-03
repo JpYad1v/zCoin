@@ -248,6 +248,7 @@ app.post("/buy", (req, res) => {
         var updatedInvestorWalletPrice = investorWalletPrice - buyPriceFromInvestor;
         const updateRewardResult = con.query(`UPDATE investors SET Reward = '${updatedInvestorWalletPrice}' WHERE UserName = '${investorUsername}';`);
         if (updateRewardResult.affectedRows > 0) {
+          const insertOrders = con.query(`INSERT INTO orders (UserName, BuyOrSell, CoinSymbol, Price, Qty, CurrentTimeStamp) VALUES ('${investorUsername}', 'BUY', '${buyCoinSymbol}', ${buyPriceFromInvestor}, ${coinQty}, '${timestamp.getTimeStamp()}');`);
           console.log("UPDATED INVESTOR REWARD !");
           res.render('investor/assets', {
             symbol: buyCoinSymbol,
@@ -281,6 +282,7 @@ app.post("/buy", (req, res) => {
         // 2. UPDATE REWARD
         const updateRewardResult = con.query(`UPDATE investors SET Reward = '${updatedInvestorWalletPrice}' WHERE UserName = '${investorUsername}';`);
         if (updateRewardResult.affectedRows > 0) {
+          const insertOrders = con.query(`INSERT INTO orders (UserName, BuyOrSell, CoinSymbol, Price, Qty, CurrentTimeStamp) VALUES ('${investorUsername}', 'BUY', '${buyCoinSymbol}', ${buyPriceFromInvestor}, ${coinQty}, '${timestamp.getTimeStamp()}');`);
           console.log("UPDATED INVESTOR REWARD !");
         } else {
           console.log("ERROR !");
@@ -451,7 +453,7 @@ app.post("/sell", (req, res) => {
       const updateBuyCoinResult = con.query(`UPDATE investors SET Reward = ${updatedReward} WHERE UserName = '${investorUsername}';`);
       if (updateBuyCoinResult.affectedRows > 0) {
         console.log("UPDATED THE INVESTORS REWARD");
-
+        const insertOrders = con.query(`INSERT INTO orders (UserName, BuyOrSell, CoinSymbol, Price, Qty, CurrentTimeStamp) VALUES ('${investorUsername}', 'SELL', '${sellSymbol}', ${sellPrice}, ${totalSellCoins}, '${timestamp.getTimeStamp()}');`);
         const rewardPriceResult = con.query(`SELECT Reward FROM investors WHERE UserName = '${investorUsername}';`);
         console.log("PORTFOLIO PRICE = " + rewardPriceResult[0]['Reward']);
         var portfolioPrice = rewardPriceResult[0]['Reward'];
@@ -512,6 +514,11 @@ app.post("/sell", (req, res) => {
     }
 
   }
+})
+
+// 4. ORDERS
+app.get("/orders", (req, res) => {
+  res.render('investor/orders')
 })
 
 // 5. GET INVESTOR LOGOUT
@@ -712,3 +719,16 @@ app.listen(3000, function() {
 
 // ORDERS
 // USERNAME - Buy/Sell - SYMBOL - PRICE - QTY - TIMESTAMP
+// DB QUERY
+/*
+CREATE TABLE Orders (
+	UserName VARCHAR(100),
+	FOREIGN KEY (UserName) REFERENCES investors(UserName),
+	BuyOrSell VARCHAR(20),
+	CoinSymbol VARCHAR(20),
+	FOREIGN KEY (CoinSymbol) REFERENCES addcoin(CoinSymbol),
+	Price int,
+	Qty float(10),
+	CurrentTimeStamp VARCHAR(20)
+);
+*/

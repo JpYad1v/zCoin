@@ -39,12 +39,52 @@
     </ul>
   </div>
 
-  <div class="crypto-table">
+  <div id = "orderDetails" class="crypto-table">
     <center><h4>My Ordres</h4> <br>
     <p>BUY / SELL </p>
     <p>SYMBOL &emsp; PRICE &emsp; QTY</p></center>
+    <p id = "test"></p>
     <hr>
   </div>
+
+<script type="text/javascript">
+  var buyOrSell = "<%= buyOrSell %>";
+  var coinSymbol = "<%= coinSymbol %>";
+  var price = "<%= price %>";
+  var qty = "<%= qty %>";
+  var currentTimestamp = "<%= currentTimestamp %>";
+
+  buyOrSell = buyOrSell.split(",");
+  coinSymbol = coinSymbol.split(",");
+  price = price.split(",");
+  qty = qty.split(",");
+  currentTimestamp = currentTimestamp.split(",");
+
+  console.log(buyOrSell);
+  console.log(coinSymbol);
+  console.log(price);
+  console.log(qty);
+  console.log(currentTimestamp);
+
+  var html = "<center> <h4>My Ordres</h4>  <br> ";
+
+  for (let i = 0; i < buyOrSell.length - 1; i++) {
+    if (buyOrSell[i] == "BUY") {
+      html += "<h4 style='color:lightgreen'>" + buyOrSell[i] + "</h4>";
+    } else {
+      html += "<h4 style='color:red'>" + buyOrSell[i] + "</h4>";
+    }
+    html += "<p>" + coinSymbol[i] + "&emsp;&emsp;";
+    html += "PRICE : " + price[i] + "&emsp;&emsp;";
+    html += "QTY : " + qty[i] + "&emsp;&emsp;";
+    html += currentTimestamp[i] + "</p>";
+    html += "<hr style='height:1px;border-width:0;background-color:#000'>"
+  }
+
+  console.log(html);
+
+  document.getElementById('orderDetails').innerHTML = html;
+</script>
 
 </body>
 

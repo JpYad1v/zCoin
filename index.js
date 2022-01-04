@@ -518,7 +518,34 @@ app.post("/sell", (req, res) => {
 
 // 4. ORDERS
 app.get("/orders", (req, res) => {
-  res.render('investor/orders')
+  const ordersResult = con.query(`SELECT * FROM orders WHERE UserName = '${investorUsername}'`);
+  var buyOrSell = "";
+  var coinSymbol = "";
+  var price = "";
+  var qty = "";
+  var currentTimestamp = "";
+
+  for (let i = 0; i < ordersResult.length; i++) {
+    buyOrSell += ordersResult[i]['BuyOrSell'] + ",";
+    coinSymbol += ordersResult[i]['CoinSymbol'] + ",";
+    price += ordersResult[i]['Price'] + ",";
+    qty += ordersResult[i]['Qty'] + ",";
+    currentTimestamp += ordersResult[i]['CurrentTimeStamp'] + ",";
+  }
+
+  console.log(buyOrSell);
+  console.log(coinSymbol);
+  console.log(price);
+  console.log(qty);
+  console.log(currentTimestamp);
+
+  res.render('investor/orders', {
+    buyOrSell: buyOrSell,
+    coinSymbol: coinSymbol,
+    price: price,
+    qty: qty,
+    currentTimestamp: currentTimestamp
+  })
 })
 
 // 5. GET INVESTOR LOGOUT

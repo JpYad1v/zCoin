@@ -1,7 +1,0 @@
-<div class="crypto-table">
-  <center><h4>My Ordres</h4> <br>
-  <p>BUY / SELL </p>
-  <p>SYMBOL &emsp; PRICE &emsp; QTY</p></center>
-  <p id = "test"></p>
-  <hr>
-</div>

@@ -77,6 +77,11 @@
   <script type="text/javascript">
     var dbCoins = "<%= dbCoins %>";
     var username = "<%= username %>";
+    var announcement = "<%= announcement %>";
+
+    announcement = announcement.split(",");
+
+    console.log(announcement);
     //dbCoins = dbCoinsfromNodejs.substring(0, dbCoinsfromNodejs.length - 1);
 
     // SPINNER
@@ -113,7 +118,7 @@
 
           //$('#crypto').html(html);
           document.querySelector('#crypto').innerHTML =
-            '<table class="table"><center><h4><img src="./images/chat.png" height="40px" width="40px" alt="Hi"> &ensp;"' + username + '" Start Your Trade with a Bammm !</h4></center><br> <div class="wallet" style="box-shadow: 0 5px 15px rgb(93 27 248 / 50%); padding: 20px; width:90%; margin:auto;"><h4> <img src="./images/megaphone.png" height="40px" width="40px" alt="MegaPhone"> &ensp; New Announcements : </h4><br> <p>New Coin Listed - BTC <br><br> AVAX Releasing Soon - Start Investing on this popular coin </p></div> <br><br><center><h4>Todays cryptocurrency prices from &#8212; <span style="color: #5D1BF8">  Nomics | ZeroCoin </span></h4></center> <br> <thead class="thread-light"><tr><th scope="col"></th><th scope="col">SYMBOL</th><th scope="col">PRICE</th><th scope="col">24H CHANGE</th><th scope="col">RANK</th></tr></thead><tbody>' + html + '</tbody></table>';
+            '<table class="table"><center><h4><img src="./images/chat.png" height="40px" width="40px" alt="Hi"> &ensp;"' + username + '" Start Your Trade with a Bammm !</h4></center><br> <div class="wallet" style="box-shadow: 0 5px 15px rgb(93 27 248 / 50%); padding: 20px; width:90%; margin:auto;"><h4> <img src="./images/megaphone.png" height="40px" width="40px" alt="MegaPhone"> &ensp; New Announcements : </h4><br> <p>' + announcement[0] + '<br><br>' + announcement[1] + '</p></div> <br><br><center><h4>Todays cryptocurrency prices from &#8212; <span style="color: #5D1BF8">  Nomics | ZeroCoin </span></h4></center> <br> <thead class="thread-light"><tr><th scope="col"></th><th scope="col">SYMBOL</th><th scope="col">PRICE</th><th scope="col">24H CHANGE</th><th scope="col">RANK</th></tr></thead><tbody>' + html + '</tbody></table>';
         })
     }
     getData();

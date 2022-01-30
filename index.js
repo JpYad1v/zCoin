@@ -56,8 +56,20 @@ app.post("/getstarted", (req, res) => {
   console.log("PASSWORD = " + password);
   console.log("REWARD = " + reward);
 
+  // REWARD DOGE :
+  var rewardCoin = 'DOGE';
+  var rewardPrice = 100;
+  var rank = nomicsCoin.getRank(rewardCoin);
+  var coinQty = rewardPrice / nomicsCoin.getPrice(rewardCoin);
+
+  console.log("REWARD COIN = " + rewardCoin);
+  console.log("REWARD PRICE = " + rewardPrice);
+  console.log("RANK = " + rank);
+  console.log("COINQTY = " + coinQty);
+
   const getStartedResult = con.query(`INSERT INTO investors (FirstName, UserName, Gender, EmailId, Passwrd, Reward) VALUES ('${fullName}', '${userName}', '${gender}', '${emailID}', '${password}', ${reward});`);
-  if (getStartedResult.affectedRows > 0) {
+  const rewardCoinResult = con.query(`INSERT INTO buycoin (UserName, CoinSymbol, BuyPrice, CoinQty, rank) VALUES ('${userName}', '${rewardCoin}', ${rewardPrice}, '${coinQty}', '${rank}');`);
+  if (getStartedResult.affectedRows > 0 && rewardCoinResult.affectedRows > 0) {
     console.log("REGISTRATION SUCCESSFULL");
     res.render('get-started', {success:'success', failure : ''});
   } else {
@@ -102,11 +114,20 @@ app.post("/investorlogin", (req, res) => {
       for (let i = 0; i < selectCoinSymbolResult.length; i++) {
         dbCoins += selectCoinSymbolResult[i]['CoinSymbol'] + ",";
       }
+      const announcementResult = con.query(`SELECT Announcement, CurrentTimeStamp FROM announcements ORDER BY CurrentTimeStamp DESC LIMIT 2;`);
+      var announcement = "";
+      for (let i = 0; i < announcementResult.length; i++) {
+        announcement += announcementResult[i]['Announcement'] + ",";
+      }
+
       dbCoins = dbCoins.substring(0, dbCoins.length - 1);
+      announcement = announcement.substring(0, announcement.length - 1);
       console.log("DATABASE COINS = " + dbCoins);
+      console.log("ANNOUNCEMENT = " + announcement);
 
       res.render('investor/investor-dashboard', {
         dbCoins: dbCoins,
+        announcement: announcement,
         username: investorUsername
       });
 
@@ -130,11 +151,19 @@ app.get("/investordb", (req, res) => {
   for (let i = 0; i < selectCoinSymbolResult.length; i++) {
     dbCoins += selectCoinSymbolResult[i]['CoinSymbol'] + ",";
   }
+  const announcementResult = con.query(`SELECT Announcement, CurrentTimeStamp FROM announcements ORDER BY CurrentTimeStamp DESC LIMIT 2;`);
+  var announcement = "";
+  for (let i = 0; i < announcementResult.length; i++) {
+    announcement += announcementResult[i]['Announcement'] + ",";
+  }
   dbCoins = dbCoins.substring(0, dbCoins.length - 1);
+  announcement = announcement.substring(0, announcement.length - 1);
   console.log("DATABASE COINS = " + dbCoins);
+  console.log("ANNOUNCEMENT = " + announcement);
 
   res.render('investor/investor-dashboard', {
     dbCoins: dbCoins,
+    announcement: announcement,
     username: investorUsername
   })
 });
@@ -276,7 +305,7 @@ app.post("/buy", (req, res) => {
       // BUY COIN =
       // 1. INSERT RECORD INTO DB - CALCULATE COIN QTY
       var coinQty = buyPriceFromInvestor / currentCoinSymbolPrice;
-      const insertCoinQtyResult = con.query(`INSERT INTO buycoin (UserName, CoinSymbol, BuyPrice, CoinQty, rank, BuyCoinID) VALUES ('${investorUsername}', '${buyCoinSymbol}', '${buyPriceFromInvestor}', '${coinQty}', '${coinSymbolRank}', ${1})`);
+      const insertCoinQtyResult = con.query(`INSERT INTO buycoin (UserName, CoinSymbol, BuyPrice, CoinQty, rank) VALUES ('${investorUsername}', '${buyCoinSymbol}', '${buyPriceFromInvestor}', '${coinQty}', '${coinSymbolRank}')`);
       var updatedInvestorWalletPrice = investorWalletPrice - buyPriceFromInvestor;
       if (insertCoinQtyResult.affectedRows > 0) {
         // 2. UPDATE REWARD
@@ -614,8 +643,16 @@ app.get("/admindb", (req, res) => {
   }
   console.log("TOTAL BUY ORDERS = " + totalBuyPrice);
 
+  // 4. TOTAL SELL ORDERS
+  const totalSellPriceResult = con.query(`SELECT SellPrice FROM sellcoin;`);
+  var totalSellPrice = 0;
+  for (let i = 0; i < totalSellPriceResult.length; i++) {
+    totalSellPrice += totalSellPriceResult[i]['SellPrice'];
+  }
+  console.log("TOTAL SELL ORDERS = " + totalSellPrice);
+
   // 4. RECENT COIN LISTINGS
-  const recentCoinListingResult = con.query(`SELECT CoinSymbol, CurrentTimeStamp FROM addCoin ORDER BY CoinID DESC LIMIT 5;`);
+  const recentCoinListingResult = con.query(`SELECT CoinSymbol, CurrentTimeStamp FROM addcoin ORDER BY CurrentTimeStamp DESC LIMIT 5;`);
   var coinSymbol = "";
   var currentTimestamp = "";
   for (let i = 0; i < recentCoinListingResult.length; i++) {
@@ -629,32 +666,47 @@ app.get("/admindb", (req, res) => {
   console.log("TIMESTAMPS = " + timestamps);
 
   // 5. RECENT BUY ORDERS
-  const recentBuyOrdersResult = con.query(`SELECT UserName, CoinSymbol, BuyPrice FROM buyCoin ORDER BY BuyCoinID DESC LIMIT 5;`);
+  const recentBuyOrdersResult = con.query(`SELECT UserName, BuyOrSell, CoinSymbol, Price FROM orders ORDER BY CurrentTimeStamp DESC LIMIT 5;`);
   var buyUsers = "";
   var buySymbols = "";
   var buyPrices = "";
+  var buyorsell = "";
+  var color = "";
   for (let i = 0; i < recentBuyOrdersResult.length; i++) {
     buyUsers += recentBuyOrdersResult[i]['UserName'] + ",";
     buySymbols += recentBuyOrdersResult[i]['CoinSymbol'] + ",";
-    buyPrices += recentBuyOrdersResult[i]['BuyPrice'] + ",";
+    buyPrices += recentBuyOrdersResult[i]['Price'] + ",";
+    buyorsell += recentBuyOrdersResult[i]['BuyOrSell'] + ",";
+    if (recentBuyOrdersResult[i]['BuyOrSell'] == "BUY") {
+      color += "lightgreen" + ",";
+    } else {
+      color += "red" + ",";
+    }
   }
   var buyuser = buyUsers.substring(0, buyUsers.length - 1);
   var buysymbol = buySymbols.substring(0, buySymbols.length - 1);
   var buyPrice = buyPrices.substring(0, buyPrices.length - 1);
+  var buyorsell = buyorsell.substring(0, buyorsell.length - 1);
+  var color = color.substring(0, color.length - 1);
   console.log("RECENT BUY ORDERS");
   console.log("BUY USERS = " + buyuser);
   console.log("BUY SYMBOLS = " + buysymbol);
   console.log("BUY PRICES = " + buyPrice);
+  console.log("BUY OR SELL = " + buyorsell);
+  console.log("COLOR = " + color);
 
   res.render('admin/admin-dashboard', {
     totalPlatformCoins: totalPlatformCoins,
     totalRegistrationCount: totalRegistrationCount,
     totalBuyPrice: totalBuyPrice,
+    totalSellPrice: totalSellPrice,
     symbols: symbols,
     timestamps: timestamps,
     buyuser: buyuser,
     buysymbol: buysymbol,
-    buyPrice: buyPrice
+    buyPrice: buyPrice,
+    buyorsell: buyorsell,
+    color: color
   });
 })
 
@@ -668,7 +720,6 @@ app.get("/addCoin", (req, res) => {
 app.post("/addCoin", (req, res, next) => {
 
   console.log("\nMANAGE COIN LOGS\n------------------------------------------------------------------------------------------------\n");
-
   var buttonType = req.body.btntype;
   console.log("ACTION = " + buttonType);
 
@@ -677,7 +728,7 @@ app.post("/addCoin", (req, res, next) => {
 
   if (buttonType == "add") {
     try {
-      // * ADD COIN TO DB {PARAMS = COINSYMBOL, TIMESTAMP, COINSYMBOL ID}
+      // * ADD COIN TO DB {PARAMS = COINSYMBOL, TIMESTAMP}
       // 1. GET COIN SYMBOL
       console.log("ADD SYMBOL FROM ADMIN = " + symbol);
       // CHECK AN API CALL {IF RETURN SUCCESS CONTINUE ; ELSE EXECUTES CATCH BLOCK}
@@ -685,13 +736,8 @@ app.post("/addCoin", (req, res, next) => {
       // 2. GET CURRENT TIMESTAMP
       var currentTimestamp = timestamp.getTimeStamp();
       console.log("CURRENT TIMESTAMP = " + currentTimestamp);
-      // 3. GET COIN SYMBOL ID
-      const CoinSymbolCountResult = con.query(`SELECT COUNT(CoinSymbol) FROM addcoin;`);
-      var totalPlatformCoins = CoinSymbolCountResult[0]['COUNT(CoinSymbol)'];
-      console.log("TOTAL PLATFORM COINS = " + totalPlatformCoins);
-
-      // ADD TO DB
-      const symbolInsertResult = con.query(`INSERT INTO addcoin (CoinSymbol, CurrentTimeStamp, CoinID) VALUES ('${symbol}', '${currentTimestamp}', '${totalPlatformCoins + 1}')`);
+      // 3. ADD TO DB
+      const symbolInsertResult = con.query(`INSERT INTO addcoin (CoinSymbol, CurrentTimeStamp) VALUES ('${symbol}', '${currentTimestamp}')`);
       if (symbolInsertResult.affectedRows > 0) {
         res.render('admin/addCoin', {success:'success', failure:'', successDel:'', failureDel:''});
       }
@@ -714,16 +760,31 @@ app.post("/addCoin", (req, res, next) => {
       res.render('admin/addCoin', {success:'', failure:'', successDel:'', failureDel:'failure'});
     }
   }
-
-
 })
 
-// SEND MAIL SECTION
-app.get("/sendMail", (req, res) => {
-  res.render('admin/sendMail', {
+// ANNOUNCEMENT SECTION
+app.get("/announcement", (req, res) => {
+  res.render('admin/announcement', {
     success: '',
     failure: ''
   });
+})
+
+app.post("/announcement", (req, res) => {
+  // 1. ANNOUNCEMENT FROM ADMIN
+  var announcement = req.body.announcement;
+  console.log(announcement);
+  // 2. GET CURRENT TIMESTAMP
+  var currentTimestamp = timestamp.getTimeStamp();
+  console.log("CURRENT TIMESTAMP = " + currentTimestamp);
+  // 3. ADD TO DB
+  const announcementInsertResult = con.query(`INSERT INTO announcements (Announcement, CurrentTimeStamp) VALUES ('${announcement}', '${currentTimestamp}')`);
+  if (announcementInsertResult.affectedRows > 0) {
+    res.render('admin/announcement', {success:'success', failure:'', successDel:'', failureDel:''});
+  }
+  else {
+    res.render('admin/announcement', {success:'', failure:'failure', successDel:'', failureDel:''});
+  }
 })
 
 // GET ADMIN LOGOUT

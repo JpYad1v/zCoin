@@ -34,7 +34,7 @@
     <ul>
       <li><a href="admindb"><img class="coins" src="./images/admin/line-graph.png" alt="ADMIN DB"></a></li>
       <li><a href="addCoin"><img class="coins" src="./images/admin/coins.png" alt="ADD COIN"></a></li>
-      <li><a href="sendMail"><img class="coins" src="./images/admin/message.png" alt="SEND NOTIFICATIONS"></a></li>
+      <li><a href="announcement"><img class="coins" src="./images/admin/message.png" alt="SEND NOTIFICATIONS"></a></li>
       <li><a href="adminlogout"><img class="coins" src="./images/admin/logout.png" alt="LOGOUT"></a></li>
     </ul>
   </div>
@@ -56,7 +56,7 @@
 
   <div class="total-sell-orders">
     <p class="heading">Total Sell Orders</p> <br>
-    <p class="values"><%= totalBuyPrice %></p>
+    <p class="values"><%= totalSellPrice %></p>
   </div>
 
   <div id="recentOrders" class="recent-orders"></div>
@@ -93,24 +93,28 @@
     var buyuser = "<%= buyuser %>";
     var buysymbol = "<%= buysymbol %>";
     var buyPrice = "<%= buyPrice %>";
+    var buyorsell = "<%= buyorsell %>";
+    var color = "<%= color %>";
 
     buyuser = buyuser.split(",");
     buysymbol = buysymbol.split(",");
     buyPrice = buyPrice.split(",");
+    buyorsell = buyorsell.split(",");
+    color = color.split(",");
 
     document.querySelector('#recentOrders').innerHTML =
     `
-    <h4 class="recent-heading">Recent Buy Orders</h4>
+    <h4 class="recent-heading">Recent Orders</h4>
     <hr class="headerLine">
     <center>
     <table class="table">
-    <thead> <tr> <th class="text-center" scope="col">User</th> <th class="text-center" scope="col">Coin Symbol</th> <th class="text-center" scope="col">Buy Price</th> </tr> </thead>
+    <thead> <tr> <th class="text-center" scope="col">User</th> <th class="text-center" scope="col">Buy/Sell</th> <th class="text-center" scope="col">Coin Symbol</th> <th class="text-center" scope="col">Price</th> </tr> </thead>
     <tbody>
-    <tr><td class="text-center"> ${buyuser[0]} </td><td class="text-center"> ${buysymbol[0]} </td><td style="color:lightgreen" class="text-center"> ${buyPrice[0]} </td></tr>
-    <tr><td class="text-center"> ${buyuser[1]} </td><td class="text-center"> ${buysymbol[1]} </td><td style="color:lightgreen" class="text-center"> ${buyPrice[1]} </td></tr>
-    <tr><td class="text-center"> ${buyuser[2]} </td><td class="text-center"> ${buysymbol[2]} </td><td style="color:lightgreen" class="text-center"> ${buyPrice[2]} </td></tr>
-    <tr><td class="text-center"> ${buyuser[3]} </td><td class="text-center"> ${buysymbol[3]} </td><td style="color:lightgreen" class="text-center"> ${buyPrice[3]} </td></tr>
-    <tr><td class="text-center"> ${buyuser[4]} </td><td class="text-center"> ${buysymbol[4]} </td><td style="color:lightgreen" class="text-center"> ${buyPrice[4]} </td></tr>
+    <tr><td class="text-center"> ${buyuser[0]} </td><td style="color:${color[0]}" class="text-center"> ${buyorsell[0]} </td><td class="text-center"> ${buysymbol[0]} </td><td style="color:${color[0]}" class="text-center"> ${buyPrice[0]} </td></tr>
+    <tr><td class="text-center"> ${buyuser[1]} </td><td style="color:${color[1]}" class="text-center"> ${buyorsell[1]} </td><td class="text-center"> ${buysymbol[1]} </td><td style="color:${color[1]}" class="text-center"> ${buyPrice[1]} </td></tr>
+    <tr><td class="text-center"> ${buyuser[2]} </td><td style="color:${color[2]}" class="text-center"> ${buyorsell[2]} </td><td class="text-center"> ${buysymbol[2]} </td><td style="color:${color[2]}" class="text-center"> ${buyPrice[2]} </td></tr>
+    <tr><td class="text-center"> ${buyuser[3]} </td><td style="color:${color[3]}" class="text-center"> ${buyorsell[3]} </td><td class="text-center"> ${buysymbol[3]} </td><td style="color:${color[3]}" class="text-center"> ${buyPrice[3]} </td></tr>
+    <tr><td class="text-center"> ${buyuser[4]} </td><td style="color:${color[4]}" class="text-center"> ${buyorsell[4]} </td><td class="text-center"> ${buysymbol[4]} </td><td style="color:${color[4]}" class="text-center"> ${buyPrice[4]} </td></tr>
     </tbody>
     </table>
     </center>

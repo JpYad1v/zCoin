@@ -66,20 +66,27 @@
   console.log(qty);
   console.log(currentTimestamp);
 
-  var html = "<center> <h4>My Ordres</h4>  <br> ";
+  if (buyOrSell.length > 0) {
+    var html = "<center> <h4>My Ordres</h4>  <br> ";
 
-  for (let i = 0; i < buyOrSell.length - 1; i++) {
-    if (buyOrSell[i] == "BUY") {
-      html += "<h4 style='color:lightgreen'>" + buyOrSell[i] + "</h4>";
-    } else {
-      html += "<h4 style='color:red'>" + buyOrSell[i] + "</h4>";
+    for (let i = 0; i < buyOrSell.length - 1; i++) {
+      if (buyOrSell[i] == "BUY") {
+        html += "<h4 style='color:lightgreen'>" + buyOrSell[i] + "</h4>";
+      } else {
+        html += "<h4 style='color:red'>" + buyOrSell[i] + "</h4>";
+      }
+      html += "<p>" + coinSymbol[i] + "&emsp;&emsp;";
+      html += "PRICE : " + price[i] + "&emsp;&emsp;";
+      html += "QTY : " + qty[i] + "&emsp;&emsp;";
+      html += currentTimestamp[i] + "</p>";
+      html += "<hr style='height:1px;border-width:0;background-color:#000'>"
     }
-    html += "<p>" + coinSymbol[i] + "&emsp;&emsp;";
-    html += "PRICE : " + price[i] + "&emsp;&emsp;";
-    html += "QTY : " + qty[i] + "&emsp;&emsp;";
-    html += currentTimestamp[i] + "</p>";
-    html += "<hr style='height:1px;border-width:0;background-color:#000'>"
+  } else {
+    var html = "<center> <h4>My Ordres</h4>  <br> ";
+
+    html += "<p> You orders are nill - start trading now ! </p>"
   }
+
 
   console.log(html);
 
